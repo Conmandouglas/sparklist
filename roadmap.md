@@ -1,7 +1,7 @@
 **ROADMAP**
 [] Add basic backend routes
-  [] Get all todos
-  [] Create todo
+  [3/22/2025 6:18pm] Get all todos
+  [3/22/2025 6:18pm] Create todo
   [] Delete todo
   [] Get a specific todo
   [] Edit a todo
@@ -29,8 +29,10 @@
   [] On note creation screen, add abilility to add a time to remind
   [] Once created, it will display it on the home screen until the creator
 [] Add a sound when the user creates a note
+[] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
 [] Add multi-user support (review some authentication)
   [] Add log in with Google
   [] Add regular log in that is secure with bitcrypt
   [] Add more log in with options
 [] Add the ability to import todos from Google Keep using API
+[] Go back to drawing board, try to get inspiration off of other websites, and think of something unique maybe
