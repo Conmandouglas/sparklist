@@ -2,9 +2,9 @@
 [] Add basic backend routes
   [3/22/2025 6:18pm] Get all todos
   [3/22/2025 6:18pm] Create todo
-  [] Delete todo
-  [] Get a specific todo
-  [] Edit a todo
+  [3/23/2025 5:33pm] Delete todo
+  [3/23/2025 5:33pm] Get a specific todo
+  [3/23/2025 5:33pm] Edit a todo
 [] Connect routes to the frontend
 [] Add styling using Bootstrap and the open source UI
   [] Add animations like in Keeper
