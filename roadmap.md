@@ -6,6 +6,8 @@
   [3/23/2025 5:33pm] Get a specific todo
   [3/23/2025 5:33pm] Edit a todo
 [] Connect routes to the frontend
+  [3/24/2025 6:03pm] Get all todos route
+  [3/24/2025 6:03pm] Delete todos route and button
 [] Add styling using Bootstrap and the open source UI
   [] Add animations like in Keeper
 [] Add the bootstrap lightbox to edit the todos
