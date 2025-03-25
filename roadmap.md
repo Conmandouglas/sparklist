@@ -1,13 +1,15 @@
 **ROADMAP**
-[] Add basic backend routes
+[3/23/2025 5:33pm] Add basic backend routes
   [3/22/2025 6:18pm] Get all todos
   [3/22/2025 6:18pm] Create todo
   [3/23/2025 5:33pm] Delete todo
   [3/23/2025 5:33pm] Get a specific todo
   [3/23/2025 5:33pm] Edit a todo
-[] Connect routes to the frontend
+[3/35/2025 4:17pm] Connect routes to the frontend
   [3/24/2025 6:03pm] Get all todos route
   [3/24/2025 6:03pm] Delete todos route and button
+  [3/35/2025 4:17pm] Add todo route
+  [3/35/2025 4:17pm] Edit todo route
 [] Add styling using Bootstrap and the open source UI
   [] Add animations like in Keeper
 [] Add the bootstrap lightbox to edit the todos
