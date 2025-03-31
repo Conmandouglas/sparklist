@@ -74,6 +74,15 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
 
       <div className="container-fluid">
         <form onSubmit={onSubmitForm} className="d-flex flex-column">
+          {/*text here that shows only if character limit is reached on title, or content.
+          what it says is dependent on what is exceeded, ex "Title character limit reached!" or 
+          "Title and Content character limit reached!" 
+          get the input element
+          add event listener for it checkMaxLength
+          for that function if inputElement.value.length is greater than or equal to inputElement.maxLength
+          then using ternary operator this displays.
+          for now, have one that displays if title limit reached, and one if content limit reached
+          for simplicity.  */}
           <input
             type="text"
             className="form-control mb-2"
