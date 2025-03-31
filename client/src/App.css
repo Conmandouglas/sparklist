@@ -1,0 +1,16 @@
+ul {
+  list-style-type: none;
+}
+
+.todo-item {
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 4px;
+  background-color: rgb(255, 255, 206);
+  /*MAKE COLOR CUSTOMIZABLE*/
+}
+
+body {
+  background-color: #ffffff;
+  background-image: url("https://www.transparenttextures.com/patterns/bedge-grunge.png");
+}

@@ -44,7 +44,7 @@ const EditTodo = ({ todo, fetchTodos }) => {
     <>
       <button
         type="button"
-        className="btn btn-warning"
+        className="btn btn-warning p-1 px-2"
         data-bs-toggle="modal"
         data-bs-target={`#id${todo?.todo_id}`}
       >
@@ -79,12 +79,14 @@ const EditTodo = ({ todo, fetchTodos }) => {
             <div className="modal-body">
               <input
                 type="text"
-                className="form-control"
+                className="form-control mb-2"
                 value={title}
+                placeholder="Edit title"
                 onChange={(e) => setTitle(e.target.value)}
               />
               <input
                 type="text"
+                placeholder="Edit note"
                 className="form-control"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}

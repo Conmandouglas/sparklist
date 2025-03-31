@@ -1,7 +1,9 @@
-CREATE DATABASE items;
+CREATE DATABASE contodo;
 
 CREATE TABLE items(
   item_id SERIAL PRIMARY KEY,
   title VARCHAR(30),
   content VARCHAR(255)
 );
+
+ALTER TABLE items ADD COLUMN color VARCHAR(7);
