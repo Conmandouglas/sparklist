@@ -17,10 +17,9 @@
 [CANCELED] Add text effects in box to toggle (rich text editor)
   - unessecary for purpose of application, tedious to add for what it is worth
 [3/31/2025 5:15pm] Add ability to choose from a list of colors for the note
-[] Add red text when exceeded character limit
-  [] red text for title
-  [] red text for description
-  [] conditional red text for both content and title
+[4/1/2025 5:35pm] Add red text when exceeded character limit
+  [4/1/2025 5:35pm] red text for title
+  [4/1/2025 5:35pm] red text for content
 [] Add ability to pin up to three notes to stay at the top
 [] Add ability to order notes based on importance (one of three exclamation points)
 [] Add a sidebar hamburger menu

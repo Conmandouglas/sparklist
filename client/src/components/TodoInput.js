@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import ColorButton from "./ColorButton.js";
-import Heading from "./Heading.js"
+import InfoText from "./InfoText.js";
 
 const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, setSelectionRange, onSubmit }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [color, setColor] = useState("");
+  const [titleLimit, setTitleLimit] = useState(false);
+  const [contentLimit, setContentLimit] = useState(false);
   const textareaRef = useRef(null);
 
   function setTheColor(newColor) {
@@ -17,7 +19,12 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
     if (textareaRef.current && textareaRef.current.value !== content) {
       textareaRef.current.value = content.replace(/&nbsp;/g, " ");
     }
+    setContentLimit(content.length >= 255);
   }, [content]);
+
+  useEffect(() => {
+    setTitleLimit(title.length >= 30);
+  }, [title])
 
   // Track selection and its range when text is selected
   const handleSelection = () => {
@@ -70,19 +77,9 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
 
   return (
     <>
-      <Heading />
-
       <div className="container-fluid">
         <form onSubmit={onSubmitForm} className="d-flex flex-column">
-          {/*text here that shows only if character limit is reached on title, or content.
-          what it says is dependent on what is exceeded, ex "Title character limit reached!" or 
-          "Title and Content character limit reached!" 
-          get the input element
-          add event listener for it checkMaxLength
-          for that function if inputElement.value.length is greater than or equal to inputElement.maxLength
-          then using ternary operator this displays.
-          for now, have one that displays if title limit reached, and one if content limit reached
-          for simplicity.  */}
+          <InfoText titleLimit={titleLimit} contentLimit={contentLimit}/>
           <input
             type="text"
             className="form-control mb-2"
@@ -98,6 +95,7 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
             onChange={(e) => setContent(e.target.value)}
             placeholder="Your note"
             rows="4"
+            maxLength="255"
           />
           <div>
             <ColorButton

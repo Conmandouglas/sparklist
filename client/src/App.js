@@ -2,6 +2,7 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import TodoInput from './components/TodoInput.js';
 import TodoList from './components/TodoList.js';
+import Heading from "./components/Heading.js"
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -43,6 +44,7 @@ function App() {
 
   return (
     <div className="container">
+      <Heading />
       <TodoInput
         fetchTodos={fetchTodos}
         onSubmit={handleSubmit}
