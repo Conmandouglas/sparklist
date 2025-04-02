@@ -20,9 +20,9 @@
 [4/1/2025 5:35pm] Add red text when exceeded character limit
   [4/1/2025 5:35pm] red text for title
   [4/1/2025 5:35pm] red text for content
-[] Order notes based on importance
-  [] Add ability to pin up to three notes to stay at the top
-  [] Add ability to order notes based on importance (one of three exclamation points)
+[4/2/2025 11:59AM] Order notes based on importance
+  [4/2/2025 11:59AM] Add ability to pin up to three notes to stay at the top
+  [4/2/2025 11:59AM] Add ability to order notes based on importance (one of three exclamation points)
 [] Sort notes through lists
   [] Add a sidebar hamburger menu
   [] Add ability to have multiple notes lists
