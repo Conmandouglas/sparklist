@@ -16,16 +16,16 @@ function App() {
 
   const fetchTodos = async () => {
     try {
-      const response = await fetch('http://localhost:5001/todos');
+      const response = await fetch("http://localhost:5001/todos");
       const data = await response.json();
-
-      // Reverse the array to show latest notes at the top
-      const reversedData = data.reverse();
-      setTodos(reversedData); // Update state with reversed data
+      console.log("Fetched data:", data); // 🔥 Debugging line
+      setTodos(data); // Make sure it's an array
     } catch (err) {
-      console.error(err.message);
+      console.error("Error fetching todos:", err.message);
     }
   };
+  
+  
 
   const handleSubmit = async (title, content) => {
     try {

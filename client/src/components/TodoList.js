@@ -17,6 +17,15 @@ const TodoList = ({ todos, fetchTodos }) => {
     }
   }
 
+  const togglePin = async (id) => {
+    try {
+      await fetch(`http://localhost:5001/todos/${id}/pin`, { method: "PUT" });
+      fetchTodos();
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
   return (
     <>
       <ul className="container-xl">
@@ -29,6 +38,7 @@ const TodoList = ({ todos, fetchTodos }) => {
             <div>
               <p>
                 <strong>{todo.title}</strong>
+                <p>{todo.importance}</p>
               </p>
             </div>
             <div>{todo.content}</div>
@@ -40,6 +50,14 @@ const TodoList = ({ todos, fetchTodos }) => {
                 Delete
               </button>
               <EditTodo todo={todo} fetchTodos={fetchTodos} />
+              <button
+                className={`btn ${
+                  todo.pinned ? "btn-warning" : "btn-outline-secondary"
+                } me-2 p-1 px-2`}
+                onClick={() => togglePin(todo.item_id)}
+              >
+                📌
+              </button>
             </div>
           </li>
         ))}

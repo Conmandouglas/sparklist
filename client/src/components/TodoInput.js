@@ -8,6 +8,7 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
   const [color, setColor] = useState("");
   const [titleLimit, setTitleLimit] = useState(false);
   const [contentLimit, setContentLimit] = useState(false);
+  const [importance, setImportance] = useState("3");
   const textareaRef = useRef(null);
 
   function setTheColor(newColor) {
@@ -49,13 +50,20 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
   const onSubmitForm = async (e) => {
     e.preventDefault();
     try {
-      const body = { title, content, color };
-      await fetch("http://localhost:5001/todos", {
+      const body = {
+        title,
+        content,
+        color,
+        importance: parseInt(importance), // Convert to number
+      };
+  
+      const response = await fetch("http://localhost:5001/todos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
+  
+      console.log(await response.json()); // Debugging response
       fetchTodos();
       setTitle("");
       setContent("");
@@ -63,6 +71,7 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
       console.error(err.message);
     }
   };
+  
 
   // Attach event listeners for selection tracking
   useEffect(() => {
@@ -79,7 +88,7 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
     <>
       <div className="container-fluid">
         <form onSubmit={onSubmitForm} className="d-flex flex-column">
-          <InfoText titleLimit={titleLimit} contentLimit={contentLimit}/>
+          <InfoText titleLimit={titleLimit} contentLimit={contentLimit} />
           <input
             type="text"
             className="form-control mb-2"
@@ -97,6 +106,14 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
             rows="4"
             maxLength="255"
           />
+          <div>
+            <label className="form-label me-2">Importance:</label>
+            <select value={importance} onChange={(e) => setImportance(e.target.value)}>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
           <div>
             <ColorButton
               color={color}

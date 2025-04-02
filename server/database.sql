@@ -1,4 +1,4 @@
-CREATE DATABASE contodo;
+CREATE DATABASE contodo; --\c contodo
 
 CREATE TABLE items(
   item_id SERIAL PRIMARY KEY,
@@ -7,3 +7,6 @@ CREATE TABLE items(
 );
 
 ALTER TABLE items ADD COLUMN color VARCHAR(7);
+
+ALTER TABLE items ADD COLUMN pinned BOOLEAN DEFAULT FALSE;
+ALTER TABLE items ADD COLUMN importance INT CHECK (importance BETWEEN 1 AND 3) DEFAULT 3;

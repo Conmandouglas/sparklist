@@ -20,22 +20,27 @@
 [4/1/2025 5:35pm] Add red text when exceeded character limit
   [4/1/2025 5:35pm] red text for title
   [4/1/2025 5:35pm] red text for content
-[] Add ability to pin up to three notes to stay at the top
-[] Add ability to order notes based on importance (one of three exclamation points)
-[] Add a sidebar hamburger menu
-[] Add ability to have multiple notes lists
-[] Add a toggle dark theme button
+[] Order notes based on importance
+  [] Add ability to pin up to three notes to stay at the top
+  [] Add ability to order notes based on importance (one of three exclamation points)
+[] Sort notes through lists
+  [] Add a sidebar hamburger menu
+  [] Add ability to have multiple notes lists
+[] Small fun features to add to the overall experience
+  [] Add a toggle dark theme button
+  [] Add a sound when the user creates a note
+  [] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
 [] Add the ability to make it remind the user by sending notification
   [] Ask user for permission to send notifications
   [] On note creation screen, add abilility to add a time to remind
   [] Once created, it will display it on the home screen until the creator
-[] Add a sound when the user creates a note
-[] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
 [] Add multi-user support (review some authentication)
   [] Add log in with Google
   [] Add regular log in that is secure with bitcrypt
   [] Add more log in with options
-[] Add ability to drag and drop notes
-[] Add the ability to import todos from Google Keep using API
+[] Long stretch features (not guarunteed to make it)
+  [CANCELED] Add ability to drag and drop notes
+  *drag and drop canceled due to the "importance" feature being more user friendly*
+  [] Add the ability to import todos from Google Keep using API
 [] Go back to drawing board, try to get inspiration off of other websites, and think of something unique maybe
  - learn how to make a simplistic but modern website that is looking good, and make website look professional but modern and simplistic, make it a bit more have character :)

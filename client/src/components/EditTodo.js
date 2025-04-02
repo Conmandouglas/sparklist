@@ -87,10 +87,16 @@ const EditTodo = ({ todo, fetchTodos }) => {
               <input
                 type="text"
                 placeholder="Edit note"
-                className="form-control"
+                className="form-control mb-2"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
+              <label className="form-label me-2">Importance:</label>
+              <select>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
             </div>
 
             <div className="modal-footer">
