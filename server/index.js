@@ -32,7 +32,6 @@ app.post('/todos', async (req, res) => {
     );
 
     res.json(newItem.rows[0]);
-
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Server error" });
@@ -46,7 +45,6 @@ app.get('/todos', async (req, res) => {
     const items = await pool.query(
       "SELECT * FROM items ORDER BY pinned DESC, importance DESC, item_id DESC"
     );
-        console.log("Database response:", items.rows); // 🔥 Debugging line
     res.json(items.rows); // Send as JSON array
   } catch (err) {
     console.error(err.message);
@@ -54,7 +52,68 @@ app.get('/todos', async (req, res) => {
   }
 });
 
+//create a list
+app.post('/lists', async (req, res) => {
+  try {
+    const { name } = req.body;
 
+    const newList = await pool.query(
+      "INSERT INTO lists (name) VALUES ($1) RETURNING *",
+      [name]
+    );
+
+    res.json(newList.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//get lists
+app.get('/lists', async (req, res) => {
+  try {
+    const lists = await pool.query(
+      "SELECT * FROM lists"
+    );
+
+    res.json(lists.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//update a list name
+app.put('/lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const newList = await pool.query(
+      "UPDATE lists SET name = $1 WHERE list_id = $2",
+      [name, id]
+    );
+
+    res.json("List name has been updated!")
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+//get specific list
+app.get('/lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const list = await pool.query(
+      "SELECT * FROM items WHERE list_id = $1",
+      [ id ]
+    );
+
+    res.json(list.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 
 //get a specific todo

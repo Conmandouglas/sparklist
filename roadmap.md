@@ -23,18 +23,22 @@
 [4/2/2025 11:59AM] Order notes based on importance
   [4/2/2025 11:59AM] Add ability to pin up to three notes to stay at the top
   [4/2/2025 11:59AM] Add ability to order notes based on importance (one of three exclamation points)
-[] Sort notes through lists
+[] Sort notes through lists **will take some time to implement**
   [] Add a sidebar hamburger menu
   [] Add ability to have multiple notes lists
 [] Small fun features to add to the overall experience
   [] Add a toggle dark theme button
   [] Add a sound when the user creates a note
   [] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
+  [] Make new fonts and colors without making like the whole
+    website a weird orange to add my own identity
 [] Add the ability to make it remind the user by sending notification
   [] Ask user for permission to send notifications
   [] On note creation screen, add abilility to add a time to remind
   [] Once created, it will display it on the home screen until the creator
 [] Add multi-user support (review some authentication)
+  [] Have a basic auto generated profile pic (different for each user) at the top of hamburger menu and then a sign in/out
+    - maybe in top right corner of screen?
   [] Add log in with Google
   [] Add regular log in that is secure with bitcrypt
   [] Add more log in with options
