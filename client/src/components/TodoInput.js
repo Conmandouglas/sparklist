@@ -27,25 +27,6 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
     setTitleLimit(title.length >= 30);
   }, [title])
 
-  // Track selection and its range when text is selected
-  const handleSelection = () => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const selected = selection.toString();
-
-      if (textareaRef.current) {
-        const startOffset = textareaRef.current.selectionStart;
-        const endOffset = textareaRef.current.selectionEnd;
-
-        setSelectedText(selected);
-        setSelectionRange({ start: startOffset, end: endOffset });
-
-        console.log(`Selected: "${selected}" at (${startOffset}, ${endOffset})`);
-      }
-    }
-  };
-
   // Handle form submission (send title and content to the server)
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -63,7 +44,6 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
         body: JSON.stringify(body),
       });
   
-      console.log(await response.json()); // Debugging response
       fetchTodos();
       setTitle("");
       setContent("");
@@ -71,18 +51,6 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
       console.error(err.message);
     }
   };
-  
-
-  // Attach event listeners for selection tracking
-  useEffect(() => {
-    document.addEventListener("mouseup", handleSelection);
-    document.addEventListener("keyup", handleSelection);
-
-    return () => {
-      document.removeEventListener("mouseup", handleSelection);
-      document.removeEventListener("keyup", handleSelection);
-    };
-  }, []);
 
   return (
     <>

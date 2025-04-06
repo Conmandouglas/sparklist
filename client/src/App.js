@@ -25,6 +25,10 @@ function App() {
     }
   };
 
+  const handleListSelect = (listTodos) => {
+    setTodos(listTodos);
+  }
+
   const handleSubmit = async (title, content) => {
     try {
       const body = { title, content };
@@ -50,6 +54,7 @@ function App() {
       <Navigation 
         isSidebarOpen={isSidebarOpen} 
         toggleSidebar={toggleSidebar} 
+        handleListSelect={handleListSelect}
       />
       <div className={`main-content ${isSidebarOpen ? 'with-sidebar' : ''}`}>
         <Heading />
