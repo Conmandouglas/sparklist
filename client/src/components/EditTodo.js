@@ -44,7 +44,7 @@ const EditTodo = ({ todo, fetchTodos }) => {
     <>
       <button
         type="button"
-        className="btn btn-warning p-1 px-2"
+        className="btn btn-warning p-1 px-2 me-1"
         data-bs-toggle="modal"
         data-bs-target={`#id${todo?.todo_id}`}
       >

@@ -55,11 +55,11 @@ app.get('/todos', async (req, res) => {
 //create a list
 app.post('/lists', async (req, res) => {
   try {
-    const { name } = req.body;
+    const { listName } = req.body;
 
     const newList = await pool.query(
       "INSERT INTO lists (name) VALUES ($1) RETURNING *",
-      [name]
+      [listName]
     );
 
     res.json(newList.rows[0]);
@@ -114,6 +114,25 @@ app.get('/lists/:id', async (req, res) => {
     console.error(err.message);
   }
 });
+
+app.delete('/lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const list = await pool.query(
+      'DELETE FROM lists WHERE list_id = $1',
+      [id]
+    );
+    res.json('List has been deleted');
+  } catch (err) {
+    if (err.code === '23503') {
+      res.status(400).json({ error: 'There are open todos in this list. Please complete them first.'})
+    } else {
+      console.error("Full error object:", err);
+      res.status(500).send("Server error");
+    }
+  }
+})
 
 
 //get a specific todo

@@ -66,6 +66,19 @@ body {
   background-image: url("https://www.transparenttextures.com/patterns/bedge-grunge.png");
 }
 
+.trash-icon {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.list-item:hover .trash-icon {
+  visibility: visible;
+  opacity: 1;
+  cursor: pointer;
+}
+
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .main-content {

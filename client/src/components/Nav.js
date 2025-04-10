@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import ListItem from './ListItem.js';
 
 function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
+  const [listName, setListName] = useState("");
   const [lists, setLists] = useState([]);
+  const [showAddList, setShowAddList] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,6 +43,52 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
     }
   }
 
+  const listButton = async () => {
+    setShowAddList(!showAddList);
+  }
+
+  const submitNewList = async (e) => {
+    e.preventDefault();
+    try {
+      setShowAddList(!showAddList);
+      const body = {
+        listName
+      }
+
+      const response = await fetch("http://localhost:5001/lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      fetchLists();
+      setListName("");
+      //get the body, find the name of the list when I create it, send it in
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
+  const listDelete = async (list_id) => {
+    try {
+      const response = await fetch(`http://localhost:5001/lists/${list_id}`, {
+        method: "DELETE",
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        alert(data.error); // 👈 Show user-friendly error
+        return;
+      }
+  
+      fetchLists(); // Refresh the list only if delete succeeded
+    } catch (err) {
+      console.error(err.message);
+      alert("Something went wrong deleting the list.");
+    }
+  };
+  
+
   return (
     <div>
       {/* Navbar */}
@@ -77,10 +125,36 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
                 name={item.name}
                 list_id={item.list_id}
                 goToList={goToList}
+                listDelete={listDelete}
               />
             );
           })}
+          <li>
+            <button
+              className="btn btn-secondary py-1 px-2"
+              style={{ display: showAddList ? "none" : "block" }}
+              onClick={listButton}
+            >
+              New List
+            </button>
+          </li>
         </ul>
+        <form
+          onSubmit={submitNewList}
+          style={{ display: showAddList ? "block" : "none" }}
+        >
+          <input
+            type="text"
+            className="form-control mb-2"
+            value={listName}
+            onChange={(e) => setListName(e.target.value)}
+            placeholder="My Awesome List"
+            maxLength="16"
+          />
+          <button type="submit" className="btn btn-success">
+            Create
+          </button>
+        </form>
       </div>
     </div>
   );
