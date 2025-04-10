@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ListItem from './ListItem.js';
 
-function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
+function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrentList, lists, setLists }) {
   const [listName, setListName] = useState("");
-  const [lists, setLists] = useState([]);
   const [showAddList, setShowAddList] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768) {
-        // Automatically open the sidebar on large screens
         toggleSidebar();
       }
     };
@@ -32,16 +30,40 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
     }
   }
 
-
   const goToList = async (list_id) => {
     try {
       const response = await fetch(`http://localhost:5001/lists/${list_id}`);
       const listTodos = await response.json();
       handleListSelect(listTodos);
+      
+      const selectedList = lists.find(list => list.list_id === list_id);
+      if (selectedList) {
+        setCurrentList({
+          list_id: selectedList.list_id,
+          name: selectedList.name
+        });
+      }
+      console.log("Fetching list:", list_id);
+      console.log("List todos:", listTodos);
     } catch (err) {
       console.error(err.message);
     }
   }
+
+  const goToAllTodos = async () => {
+    try {
+      const response = await fetch("http://localhost:5001/todos");
+      const allTodos = await response.json();
+      handleListSelect(allTodos);
+      setCurrentList({
+        list_id: "",
+        name: "All Todos"
+      });
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+  
 
   const listButton = async () => {
     setShowAddList(!showAddList);
@@ -62,7 +84,6 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
       });
       fetchLists();
       setListName("");
-      //get the body, find the name of the list when I create it, send it in
     } catch (err) {
       console.error(err.message);
     }
@@ -91,18 +112,20 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
 
   return (
     <div>
-      {/* Navbar */}
-      <nav className="navbar position-fixed top-0 start-0 w-100">
+      <nav
+        className="navbar position-fixed top-0 start-0 w-100 bg-dark text-white d-flex align-items-center px-3"
+        style={{ height: "50px", zIndex: "1050" }}
+      >
         <button
-          className="btn btn-outline-light ms-3"
+          className="btn btn-outline-light me-3"
           onClick={toggleSidebar}
           style={{ fontSize: "20px", padding: "3px 8px", lineHeight: "1" }}
         >
           ☰
         </button>
+        <h5 className="mb-0">Spark Todos</h5>
       </nav>
 
-      {/* Sidebar */}
       <div
         className={`sidebar position-fixed top-0 start-0 vh-100 text-white p-3 ${
           !isSidebarOpen ? "collapsed" : ""
@@ -118,6 +141,12 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
           className="nav flex-column"
           style={{ display: isSidebarOpen ? "block" : "none" }}
         >
+          <li className="ms-2 fw-bold">
+            <button onClick={goToAllTodos}>
+              All Todos
+            </button>
+            </li>
+          <hr></hr>
           {lists.map((item) => {
             return (
               <ListItem
@@ -145,15 +174,13 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect }) {
         >
           <input
             type="text"
-            className="form-control mb-2"
             value={listName}
             onChange={(e) => setListName(e.target.value)}
-            placeholder="My Awesome List"
-            maxLength="16"
+            placeholder="Enter list name"
+            className="form-control"
+            autoFocus
           />
-          <button type="submit" className="btn btn-success">
-            Create
-          </button>
+          <button className="btn btn-primary mt-2">Create List</button>
         </form>
       </div>
     </div>

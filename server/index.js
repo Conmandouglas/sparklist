@@ -21,15 +21,22 @@ app.use(express.json());
 //create a todo
 app.post('/todos', async (req, res) => {
   try {
-    const { title, content, color, importance } = req.body;
+    const { title, content, color, importance, list_id } = req.body;
+    
+    if (!title || !content || isNaN(importance) || isNaN(list_id)) {
+      return res.status(400).json({ error: "Invalid input." });
+    }  
     
     // Ensure importance is an integer
     const importanceValue = importance ? parseInt(importance) : 3;
 
     const newItem = await pool.query(
-      "INSERT INTO items (title, content, color, importance) VALUES ($1, $2, $3, $4) RETURNING *",
-      [title, content, color, importanceValue]
+      "INSERT INTO items (title, content, color, importance, list_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [title, content, color, importanceValue, list_id]
     );
+    if (!list_id) {
+      return res.status(400).json({ error: "Missing list_id" });
+    }    
 
     res.json(newItem.rows[0]);
   } catch (err) {
