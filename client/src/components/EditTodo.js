@@ -91,11 +91,15 @@ const EditTodo = ({ todo, fetchTodos }) => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
-              <label className="form-label me-2">Importance:</label>
-              <select>
+              <label className="form-label me-1">Importance:</label>
+              <select className="me-2">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
+              </select>
+              <label className="form-label me-1">List:</label>
+              <select>
+                <option>List 1</option>
               </select>
             </div>
 

@@ -57,6 +57,7 @@ const TodoInput = ({ fetchTodos, selectedText, setSelectedText, selectionRange, 
       <div className="container-fluid">
         <form onSubmit={onSubmitForm} className="d-flex flex-column">
           <InfoText titleLimit={titleLimit} contentLimit={contentLimit} />
+          <h2>List 1</h2> {/*make it so when submitted it posts to current list*/}
           <input
             type="text"
             className="form-control mb-2"
