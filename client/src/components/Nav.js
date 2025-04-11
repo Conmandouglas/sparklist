@@ -71,43 +71,96 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
 
   const submitNewList = async (e) => {
     e.preventDefault();
+    if (!listName.trim()) {
+      alert("List name cannot be empty.");
+      return;
+    }
+  
     try {
       setShowAddList(!showAddList);
-      const body = {
-        listName
-      }
-
+      const body = { listName };
+  
       const response = await fetch("http://localhost:5001/lists", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
-      fetchLists();
-      setListName("");
+      if (response.ok) {
+        fetchLists();
+        setListName(""); // Reset input field
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to create list");
+      }
     } catch (err) {
       console.error(err.message);
+      alert("Something went wrong while creating the list.");
     }
-  }
+  };
+  
 
   const listDelete = async (list_id) => {
     try {
-      const response = await fetch(`http://localhost:5001/lists/${list_id}`, {
-        method: "DELETE",
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-        alert(data.error); // 👈 Show user-friendly error
+      // Ensure list_id is valid
+      if (!list_id) {
+        alert("Invalid list ID");
         return;
       }
   
-      fetchLists(); // Refresh the list only if delete succeeded
+      // Check if there is only one list
+      if (lists.length === 1) {
+        alert("You are unable to delete this list. It is your only list.");
+        return;
+      }
+  
+      // Check for any todos in the list
+      const todosResponse = await fetch("http://localhost:5001/todos");
+      const todos = await todosResponse.json();
+      const todosToDelete = todos.filter((todo) => todo.list_id === list_id);
+  
+      if (todosToDelete.length > 0) {
+        const confirmDeleteTodos = window.confirm("This list contains todos. Do you want to delete them along with the list?");
+        if (confirmDeleteTodos) {
+          await Promise.all(
+            todosToDelete.map(async (todo) => {
+              const todoDeleteResponse = await fetch(`http://localhost:5001/todos/${todo.item_id}`, {
+                method: "DELETE",
+              });
+              if (!todoDeleteResponse.ok) {
+                throw new Error(`Failed to delete todo with ID: ${todo.item_id}`);
+              }
+            })
+          );
+        } else {
+          return;
+        }
+      }
+  
+      // Confirm deletion of list
+      const confirmDeleteList = window.confirm("Are you sure you want to delete this list?");
+      if (!confirmDeleteList) {
+        return;
+      }
+  
+      // Delete list from the database
+      const listDeleteResponse = await fetch(`http://localhost:5001/lists/${list_id}`, {
+        method: "DELETE",
+      });
+  
+      if (!listDeleteResponse.ok) {
+        const data = await listDeleteResponse.json();
+        alert(data.error || "Something went wrong deleting the list.");
+        return;
+      }
+  
+      fetchLists(); // Refresh list
     } catch (err) {
-      console.error(err.message);
-      alert("Something went wrong deleting the list.");
+      console.error("Error during deletion:", err.message);
+      alert("Something went wrong while deleting the list and todos.");
     }
   };
+  
+  
   
 
   return (
@@ -141,12 +194,6 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
           className="nav flex-column"
           style={{ display: isSidebarOpen ? "block" : "none" }}
         >
-          <li className="ms-2 fw-bold">
-            <button onClick={goToAllTodos}>
-              All Todos
-            </button>
-            </li>
-          <hr></hr>
           {lists.map((item) => {
             return (
               <ListItem

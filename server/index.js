@@ -64,6 +64,10 @@ app.post('/lists', async (req, res) => {
   try {
     const { listName } = req.body;
 
+    if (!listName) {
+      return res.status(400).json({ error: "List name is required" });
+    }
+
     const newList = await pool.query(
       "INSERT INTO lists (name) VALUES ($1) RETURNING *",
       [listName]
@@ -71,9 +75,11 @@ app.post('/lists', async (req, res) => {
 
     res.json(newList.rows[0]);
   } catch (err) {
+    console.error(err.message);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 //get lists
 app.get('/lists', async (req, res) => {
@@ -132,12 +138,13 @@ app.delete('/lists/:id', async (req, res) => {
     );
     res.json('List has been deleted');
   } catch (err) {
-    if (err.code === '23503') {
+    console.error(err.message);
+    /*if (err.code === '23503') {
       res.status(400).json({ error: 'There are open todos in this list. Please complete them first.'})
     } else {
       console.error("Full error object:", err);
       res.status(500).send("Server error");
-    }
+    }*/
   }
 })
 

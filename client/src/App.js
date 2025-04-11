@@ -2,7 +2,6 @@ import './App.css';
 import { useState, useEffect } from 'react';
 import TodoInput from './components/TodoInput.js';
 import TodoList from './components/TodoList.js';
-import Heading from "./components/Heading.js";
 import Navigation from "./components/Nav.js";
 
 function App() {

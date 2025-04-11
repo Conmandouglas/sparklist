@@ -23,9 +23,9 @@
 [4/2/2025 11:59AM] Order notes based on importance
   [4/2/2025 11:59AM] Add ability to pin up to three notes to stay at the top
   [4/2/2025 11:59AM] Add ability to order notes based on importance (one of three exclamation points)
-[] Sort notes through lists **will take some time to implement**
-  [] Add a sidebar hamburger menu
-  [] Add ability to have multiple notes lists
+[4/11/2024 9:11AM] Sort notes through lists **will take some time to implement**
+  [4/8/2025] Add a sidebar hamburger menu
+  [4/11/2025 9:11AM] Add ability to have multiple notes lists
 [] Small fun features to add to the overall experience
   [] Add a toggle dark theme button
   [] Add a sound when the user creates a note
