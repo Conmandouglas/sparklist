@@ -48,3 +48,4 @@
   [] Add the ability to import todos from Google Keep using API
 [] Go back to drawing board, try to get inspiration off of other websites, and think of something unique maybe
  - learn how to make a simplistic but modern website that is looking good, and make website look professional but modern and simplistic, make it a bit more have character :)
+[] Give myself a huge pat on the back for taking on this project in a organized manner :)
