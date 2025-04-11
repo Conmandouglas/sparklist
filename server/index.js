@@ -169,11 +169,11 @@ app.get('/todos/:id', async (req, res) => {
 app.put('/todos/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, color, importance } = req.body;
+    const { title, content, color, importance, list_id } = req.body;
   
     const newTodo = await pool.query(
-      "UPDATE items SET title = $1, content = $2, color = $3, importance = $4 WHERE item_id = $4",
-      [title, content, color, importance, id]
+      "UPDATE items SET title = $1, content = $2, color = $3, importance = $4, list_id = $5 WHERE item_id = $6",
+      [title, content, color, importance, list_id, id]
     );
     res.json("Item has been updated.")
   } catch (err) {

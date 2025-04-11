@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-const EditTodo = ({ todo, fetchTodos }) => {
+const EditTodo = ({ todo, fetchTodos, lists }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [selectedListId, setSelectedListId] = useState(0);
 
   //use effect
   //if a todo, set the description to the todos description
@@ -11,8 +12,10 @@ const EditTodo = ({ todo, fetchTodos }) => {
     if (todo) {
       setContent(todo.content);
       setTitle(todo.title);
+      setSelectedListId(todo.list_id); // Make sure the correct list is selected
     }
   }, [todo]);
+  
 
   //update Description funcction and take in a value
   //prevent the default functinoality
@@ -26,7 +29,8 @@ const EditTodo = ({ todo, fetchTodos }) => {
   const updateContent = async (e) => {
     e.preventDefault();
     try {
-      const body = { title, content };
+      const body = { title, content, list_id: selectedListId };
+      console.log("Updating Todo with Body:", body)
       await fetch(`http://localhost:5001/todos/${todo.item_id}`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
@@ -98,8 +102,15 @@ const EditTodo = ({ todo, fetchTodos }) => {
                 <option value="3">3</option>
               </select>
               <label className="form-label me-1">List:</label>
-              <select>
-                <option>List 1</option>
+              <select
+                value={selectedListId}
+                onChange={(e) => setSelectedListId(parseInt(e.target.value))}
+              >
+                {lists.map((list) => (
+                  <option key={list.list_id} value={list.list_id}>
+                    {list.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -107,11 +118,23 @@ const EditTodo = ({ todo, fetchTodos }) => {
               <button
                 type="button"
                 className="btn btn-warning"
-                data-bs-dismiss="modal"
-                onClick={updateContent}
+                onClick={async (e) => {
+                  await updateContent(e);
+                  // Manually close modal
+                  const modal = document.getElementById(`id${todo?.todo_id}`);
+                  const backdrop = document.querySelector(".modal-backdrop");
+                  if (modal) {
+                    modal.classList.remove("show");
+                    modal.style.display = "none";
+                    document.body.classList.remove("modal-open");
+                    document.body.style = "";
+                    if (backdrop) backdrop.remove();
+                  }
+                }}
               >
                 Edit
               </button>
+
               <button
                 type="button"
                 className="btn btn-danger"

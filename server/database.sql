@@ -24,3 +24,6 @@ ALTER TABLE items ADD COLUMN list_id INTEGER REFERENCES lists(list_id);
 - Use JOIN and only show items if list_id is equal to the one passed in when I click the button
 - For this the backend has to be edited, and the nav has to pass in information.
 */
+
+INSERT INTO items (title, content, importance, pinned, color, list_id)
+VALUES ('Test Todo for List 2', 'This is a test task under list 2.', 2, false, '#f0f0f0', 2);

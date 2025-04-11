@@ -117,7 +117,7 @@ function App() {
           currentList={currentList}
           setCurrentList={setCurrentList}
         />
-        <TodoList todos={todos} fetchTodos={fetchTodos} />
+        <TodoList todos={todos} fetchTodos={fetchTodos} lists={lists} />
       </div>
     </div>
   );
