@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ListItem from './ListItem.js';
 
-function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrentList, lists, setLists }) {
+function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrentList, lists, setLists, isLightMode }) {
   const [listName, setListName] = useState("");
   const [showAddList, setShowAddList] = useState(false);
 
@@ -166,11 +166,18 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
   return (
     <div>
       <nav
-        className="navbar position-fixed top-0 start-0 w-100 bg-dark text-white d-flex align-items-center px-3"
-        style={{ height: "50px", zIndex: "1050" }}
+        className="navbar position-fixed top-0 start-0 w-100 d-flex align-items-center px-3"
+        style={{
+          height: "50px",
+          zIndex: "1050",
+          backgroundColor: isLightMode ? "#e0e0e0" : "#1c1c1c",
+          color: isLightMode ? "#000" : "#FFD700",
+        }}
       >
         <button
-          className="btn btn-outline-light me-3"
+          className={`btn me-3 ${
+            isLightMode ? "btn-outline-dark" : "btn-outline-light"
+          }`}
           onClick={toggleSidebar}
           style={{ fontSize: "20px", padding: "3px 8px", lineHeight: "1" }}
         >
@@ -180,13 +187,15 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
       </nav>
 
       <div
-        className={`sidebar position-fixed top-0 start-0 vh-100 text-white p-3 ${
+        className={`sidebar position-fixed top-0 start-0 vh-100 p-3 ${
           !isSidebarOpen ? "collapsed" : ""
         }`}
         style={{
           width: isSidebarOpen ? "250px" : "0",
           overflow: "hidden",
           transition: "width 0.3s ease-in-out",
+          backgroundColor: isLightMode ? "#e0e0e0" : "#1c1c1c",
+          color: isLightMode ? "#000" : "#FFD700",
         }}
       >
         <h4 style={{ display: isSidebarOpen ? "block" : "none" }}>Sidebar</h4>
@@ -202,13 +211,16 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
                 list_id={item.list_id}
                 goToList={goToList}
                 listDelete={listDelete}
+                isLightMode={isLightMode}
               />
             );
           })}
           <li>
             <button
-              className="btn btn-secondary py-1 px-2"
-              style={{ display: showAddList ? "none" : "block" }}
+              className={`btn ${
+                isLightMode ? "btn-info" : "btn-success"
+              } py-1 px-2`}
+              style={{ display: showAddList ? "none" : "block", fontWeight: "425" }}
               onClick={listButton}
             >
               New List

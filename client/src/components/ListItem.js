@@ -1,11 +1,21 @@
 import React from 'react';
 
-function ListItem({ list_id, name, goToList, listDelete }) {
+function ListItem({ list_id, name, goToList, listDelete, isLightMode }) {
   return (
-    <li className="nav-item d-flex justify-content-between align-items-center list-item">
+    <li
+      className="nav-item d-flex justify-content-between align-items-center list-item"
+      style={{
+        color: isLightMode ? "#000" : "#FFD700",
+      }}
+    >
       <button
-        className="nav-link text-white flex-grow-1 text-start px-2"
+        className="nav-link flex-grow-1 text-start px-2"
         onClick={() => goToList(list_id)}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: isLightMode ? "#000" : "#ccc",
+        }}
       >
         {name}
       </button>
@@ -18,8 +28,7 @@ function ListItem({ list_id, name, goToList, listDelete }) {
           xmlns="http://www.w3.org/2000/svg"
           width="16"
           height="16"
-          fill="darkred"
-          class="bi bi-trash-fill"
+          fill={isLightMode ? "darkred" : "#FF6B6B"}
           viewBox="0 0 16 16"
           className="trash-icon"
         >
@@ -29,5 +38,6 @@ function ListItem({ list_id, name, goToList, listDelete }) {
     </li>
   );
 }
+
 
 export default ListItem;

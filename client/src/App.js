@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import TodoInput from './components/TodoInput.js';
 import TodoList from './components/TodoList.js';
 import Navigation from "./components/Nav.js";
+import ModeToggle from "./components/ModeToggle.js";
 
 function App() {
   const [lists, setLists] = useState([]);
@@ -12,6 +13,7 @@ function App() {
     list_id: "",  // Ensure this matches the other components
     name: "Loading..."
   });
+  const [isLightMode, setIsLightMode] = useState([true]);
 
   // Fetch lists when the component mounts
   useEffect(() => {
@@ -99,24 +101,34 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const toggleMode = () => {
+    setIsLightMode(!isLightMode);
+  }
+
   return (
-    <div className="app-container">
-      <Navigation 
-        isSidebarOpen={isSidebarOpen} 
-        toggleSidebar={toggleSidebar} 
+    <div
+      className="app-container"
+      data-bs-theme={isLightMode ? "light" : "dark"}
+    >
+      <Navigation
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
         handleListSelect={handleListSelect}
         setCurrentList={setCurrentList}
         lists={lists}
         setLists={setLists}
+        isLightMode={isLightMode}
       />
-      <div className={`main-content ${isSidebarOpen ? 'with-sidebar' : ''}`}>
+      <div className={`main-content ${isSidebarOpen ? "with-sidebar" : ""}`}>
         <TodoInput
           fetchTodos={fetchTodos}
           onSubmit={handleSubmit}
           currentList={currentList}
           setCurrentList={setCurrentList}
+          isLightMode={isLightMode}
         />
-        <TodoList todos={todos} fetchTodos={fetchTodos} lists={lists} />
+        <TodoList todos={todos} fetchTodos={fetchTodos} lists={lists}/>
+        <ModeToggle toggleMode={toggleMode} isLightMode={isLightMode} />
       </div>
     </div>
   );
