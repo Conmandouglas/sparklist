@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ListItem from './ListItem.js';
+import ModeToggle from "./ModeToggle.js";
 
-function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrentList, lists, setLists, isLightMode }) {
+
+function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrentList, lists, setLists, isLightMode, setIsLightMode }) {
   const [listName, setListName] = useState("");
   const [showAddList, setShowAddList] = useState(false);
 
@@ -18,6 +20,10 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
   useEffect(() => {
     fetchLists();
   }, []);
+
+  const toggleMode = () => {
+    setIsLightMode(!isLightMode);
+  }
 
   const fetchLists = async () => {
     try {
@@ -166,7 +172,7 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
   return (
     <div>
       <nav
-        className="navbar position-fixed top-0 start-0 w-100 d-flex align-items-center px-3"
+        className="navbar position-fixed top-0 start-0 w-100 d-flex flex-column align-items-start px-3"
         style={{
           height: "50px",
           zIndex: "1050",
@@ -187,11 +193,13 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
       </nav>
 
       <div
-        className={`sidebar position-fixed top-0 start-0 vh-100 p-3 ${
+        className={`sidebar position-fixed top-0 start-0 p-3 ${
           !isSidebarOpen ? "collapsed" : ""
         }`}
         style={{
+          position: "fixed",
           width: isSidebarOpen ? "250px" : "0",
+          height: "100%", // use full height, not vh
           overflow: "hidden",
           transition: "width 0.3s ease-in-out",
           backgroundColor: isLightMode ? "#e0e0e0" : "#1c1c1c",
@@ -220,7 +228,10 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
               className={`btn ${
                 isLightMode ? "btn-info" : "btn-success"
               } py-1 px-2`}
-              style={{ display: showAddList ? "none" : "block", fontWeight: "425" }}
+              style={{
+                display: showAddList ? "none" : "block",
+                fontWeight: "425",
+              }}
               onClick={listButton}
             >
               New List
@@ -241,6 +252,15 @@ function Navigation({ isSidebarOpen, toggleSidebar, handleListSelect, setCurrent
           />
           <button className="btn btn-primary mt-2">Create List</button>
         </form>
+        <div
+          style={{
+            position: "absolute",
+            bottom: "25px",
+            left: "15px",
+          }}
+        >
+          <ModeToggle toggleMode={toggleMode} isLightMode={isLightMode} isSidebarOpen={isSidebarOpen} />
+        </div>
       </div>
     </div>
   );

@@ -28,6 +28,8 @@
   [4/11/2025 9:11AM] Add ability to have multiple notes lists
 [] Small fun features to add to the overall experience
   [] Add a toggle dark theme button
+    [4/16/2025] Add basic website dark mode functionality
+    [] Change backend so hard coded color code does not save in backend
   [] Add a sound when the user creates a note
   [] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
   [] Make new fonts and colors without making like the whole

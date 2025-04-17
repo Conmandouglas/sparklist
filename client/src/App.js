@@ -3,17 +3,52 @@ import { useState, useEffect } from 'react';
 import TodoInput from './components/TodoInput.js';
 import TodoList from './components/TodoList.js';
 import Navigation from "./components/Nav.js";
-import ModeToggle from "./components/ModeToggle.js";
 
 function App() {
   const [lists, setLists] = useState([]);
   const [todos, setTodos] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar state
+  const [isLightMode, setIsLightMode] = useState(null); // start with null
   const [currentList, setCurrentList] = useState({
     list_id: "",  // Ensure this matches the other components
-    name: "Loading..."
+    name: "Loading...  (if taking too long, please refresh the page)"
   });
-  const [isLightMode, setIsLightMode] = useState([true]);
+  
+
+useEffect(() => {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
+  console.log("System prefers light mode?", mediaQuery.matches);
+  setIsLightMode(mediaQuery.matches);
+
+  // Optional: Watch for changes
+  const handleChange = (e) => {
+    console.log("System theme changed. Now prefers light mode?", e.matches);
+    setIsLightMode(e.matches);
+  };
+
+  mediaQuery.addEventListener("change", handleChange);
+  return () => mediaQuery.removeEventListener("change", handleChange);
+}, []);
+
+
+  const colorMap = {
+    yellow: {
+      light: "#ffffce",
+      dark: "#a2a212",
+    },
+    blue: {
+      light: "#ADD8E6",
+      dark: "#428ea7",
+    },
+    green: {
+      light: "#ceffce",
+      dark: "#2f962f",
+    },
+    pink: {
+      light: "#ffceeb",
+      dark: "#dd47a1",
+    },
+  };
 
   // Fetch lists when the component mounts
   useEffect(() => {
@@ -58,6 +93,21 @@ function App() {
     }
   }
 
+  useEffect(() => {
+    if (isLightMode === null) return;
+  
+    const body = document.body;
+    if (isLightMode) {
+      body.classList.add("light-mode");
+      body.classList.remove("dark-mode");
+    } else {
+      body.classList.add("dark-mode");
+      body.classList.remove("light-mode");
+    }
+  }, [isLightMode]);
+  
+  
+
   // Fetch todos based on the current selected list, only when currentList.list_id is set
   useEffect(() => {
     if (currentList.list_id) {
@@ -101,9 +151,6 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const toggleMode = () => {
-    setIsLightMode(!isLightMode);
-  }
 
   return (
     <div
@@ -118,6 +165,7 @@ function App() {
         lists={lists}
         setLists={setLists}
         isLightMode={isLightMode}
+        setIsLightMode={setIsLightMode}
       />
       <div className={`main-content ${isSidebarOpen ? "with-sidebar" : ""}`}>
         <TodoInput
@@ -126,9 +174,15 @@ function App() {
           currentList={currentList}
           setCurrentList={setCurrentList}
           isLightMode={isLightMode}
+          colorMap={colorMap}
         />
-        <TodoList todos={todos} fetchTodos={fetchTodos} lists={lists}/>
-        <ModeToggle toggleMode={toggleMode} isLightMode={isLightMode} />
+        <TodoList
+          todos={todos}
+          fetchTodos={fetchTodos}
+          lists={lists}
+          colorMap={colorMap}
+          isLightMode={isLightMode}
+        />
       </div>
     </div>
   );

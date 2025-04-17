@@ -59,11 +59,19 @@ ul {
   padding: 1.5rem;
   border-radius: 4px;
   background-color: #ffceeb; /* Customizable color */
+  transition: background-color 0.1s ease-in-out;
 }
 
-body {
+body.light-mode {
   background-color: #ffffff;
   background-image: url("https://www.transparenttextures.com/patterns/bedge-grunge.png");
+  color: #000;
+}
+
+body.dark-mode {
+  background-color: #1e1e1e;
+  background-image: none;
+  color: #f1f1f1;
 }
 
 .trash-icon {

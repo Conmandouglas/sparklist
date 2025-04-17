@@ -2,7 +2,8 @@ import React from "react";
 import EditTodo from "./EditTodo.js";
 //import edit todo
 
-const TodoList = ({ todos, fetchTodos, lists }) => {
+const TodoList = ({ todos, fetchTodos, lists, colorMap, isLightMode }) => {
+
   //delete todo function
   const deleteTodo = async (id) => {
     try {
@@ -17,6 +18,19 @@ const TodoList = ({ todos, fetchTodos, lists }) => {
     }
   }
 
+  const getTextColor = (todo) => {
+    const color = todo.color;
+  
+    // For dark mode only, override certain background colors to have black text
+    if (!isLightMode) {
+      return "white";
+    }
+  
+    // Default text color
+    return "black";
+  }
+  
+
   const togglePin = async (id) => {
     try {
       await fetch(`http://localhost:5001/todos/${id}/pin`, { method: "PUT" });
@@ -26,13 +40,30 @@ const TodoList = ({ todos, fetchTodos, lists }) => {
     }
   }
 
+  const getHexColor = (todo) => {
+    const color = todo.color;
+    let newColor = "";
+    if (color) {
+      if (isLightMode) {
+        return colorMap[color]?.light ?? "#ffffce" //returns left hand side if not null, if it is null returns right hand side
+      } else {
+        return colorMap[color]?.dark ?? "#ffffff" //returns left hand side if not null, if it is null returns right hand side
+      }
+    }
+  }
+
+
+
   return (
     <>
       <ul className="container-xl">
         {todos.map((todo) => (
           <li
             className="todo-item my-3"
-            style={{ backgroundColor: todo.color ? todo.color : "#ffffce" }}
+            style={{
+              backgroundColor: getHexColor(todo),
+              color: getTextColor(todo),
+            }}
             key={todo.item_id}
           >
             <div>
