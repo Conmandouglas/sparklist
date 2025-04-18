@@ -13,6 +13,11 @@ function App() {
     list_id: "",  // Ensure this matches the other components
     name: "Loading...  (if taking too long, please refresh the page)"
   });
+  const [audioEnabled, setAudioEnabled] = useState([true]);
+
+  const toggleAudio = () => {
+    setAudioEnabled(!audioEnabled);
+  }
   
 
 useEffect(() => {
@@ -166,6 +171,8 @@ useEffect(() => {
         setLists={setLists}
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
+        toggleAudio={toggleAudio}
+        audioEnabled={audioEnabled}
       />
       <div className={`main-content ${isSidebarOpen ? "with-sidebar" : ""}`}>
         <TodoInput
@@ -175,6 +182,8 @@ useEffect(() => {
           setCurrentList={setCurrentList}
           isLightMode={isLightMode}
           colorMap={colorMap}
+          audioEnabled={audioEnabled}
+          setAudioEnabled={setAudioEnabled}
         />
         <TodoList
           todos={todos}

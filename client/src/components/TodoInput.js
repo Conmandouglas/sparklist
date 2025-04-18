@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ColorButton from "./ColorButton.js";
 import InfoText from "./InfoText.js";
 
-const TodoInput = ({ fetchTodos, currentList, setCurrentList, onSubmit, isLightMode, colorMap }) => {
+const TodoInput = ({ fetchTodos, currentList, isLightMode, colorMap, audioEnabled, setAudioEnabled }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [colorName, setColorName] = useState("yellow"); // Default yellow color
@@ -17,6 +17,13 @@ const TodoInput = ({ fetchTodos, currentList, setCurrentList, onSubmit, isLightM
   useEffect(() => {
     setTitleLimit(title.length >= 30);
   }, [title]);
+
+  const playSound = () => {
+    if (audioEnabled) {
+      const audio = new Audio("/sounds/pop-cartoon-328167.mp3")
+      audio.play();
+    }
+  }
 
   // Handle form submission (send title and content to the server)
   const onSubmitForm = async (e) => {
@@ -47,6 +54,7 @@ const TodoInput = ({ fetchTodos, currentList, setCurrentList, onSubmit, isLightM
         body: JSON.stringify(body),
       });
 
+      playSound();
       // After submission, fetch todos again for the current list and for "All Todos"
       fetchTodos();
       setTitle("");
