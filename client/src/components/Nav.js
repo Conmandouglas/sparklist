@@ -244,7 +244,7 @@ function Navigation({
           })}
           <li>
             <button
-              className={`btn ${
+              className={`navbtn btn ${
                 isLightMode ? "btn-info" : "btn-success"
               } py-1 px-2`}
               style={{
@@ -271,24 +271,30 @@ function Navigation({
           />
           <button className="btn btn-primary mt-2">Create List</button>
         </form>
-        <div
-          style={{
-            position: "absolute",
-            bottom: "25px",
-            left: "15px",
-          }}
-        >
-          <ModeToggle
-            toggleMode={toggleMode}
-            isLightMode={isLightMode}
-            isSidebarOpen={isSidebarOpen}
-          />
-          <AudioToggle
-            toggleAudio={toggleAudio}
-            audioEnabled={audioEnabled}
-            isSidebarOpen={isSidebarOpen}
-          />
-        </div>
+        {isSidebarOpen && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: "25px",
+              left: "15px",
+            }}
+          >
+            <p className="conf d-block mb-3">Settings</p>
+            <div className="d-flex">
+              <ModeToggle
+                toggleMode={toggleMode}
+                isLightMode={isLightMode}
+                isSidebarOpen={isSidebarOpen}
+              />
+              <AudioToggle
+                toggleAudio={toggleAudio}
+                audioEnabled={audioEnabled}
+                isSidebarOpen={isSidebarOpen}
+                isLightMode={isLightMode}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

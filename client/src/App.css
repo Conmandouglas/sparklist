@@ -30,8 +30,30 @@
   z-index: 1050;
 }
 
+.container-xl {
+  font-family: "Lato", Roboto;
+  font-size: 105%;
+}
 
+.conf, h1, h2 {
+  font-family: "Special Gothic Expanded One"
+}
 
+.conf {
+  font-size: 1.3rem;
+}
+
+button, h5 {
+  font-family: "Special Gothic Condensed One", Roboto;
+}
+
+h5 {
+  font-size: 1.7rem;
+}
+
+.nav-item {
+  font-size: 1.2rem
+}
 
 /* Main content area */
 .app-container {

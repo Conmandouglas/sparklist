@@ -30,7 +30,7 @@
   [4/17/2025 6:51pm] Add a toggle dark theme button
     [4/16/2025 5:00pm] Add basic website dark mode functionality
     [4/17/2025 6:51pm] Change backend so hard coded color code does not save in backend
-  [] Add a sound when the user creates a note
+  [4/17/2025 7:01pm] Add a sound when the user creates a note
   [] Make new fonts and colors without making like the whole
     website a weird orange to add my own identity
 [] Add the ability to make it remind the user by sending notification

@@ -1,25 +1,6 @@
 import React from "react";
 
-function ColorButton({ colorName, setColorName, btnColorName, isLightMode }) {
-  const colorMap = {
-    yellow: {
-      light: "#ffffce",
-      dark: "#dfdf7f",
-    },
-    blue: {
-      light: "#ADD8E6",
-      dark: "#60aec9",
-    },
-    green: {
-      light: "#ceffce",
-      dark: "#3ebc3e",
-    },
-    pink: {
-      light: "#ffceeb",
-      dark: "#dd47a1",
-    },
-  };
-
+function ColorButton({ colorName, setColorName, btnColorName, isLightMode, colorMap }) {
   const bgColor = colorMap[btnColorName][isLightMode ? "light" : "dark"];
 
   return (
