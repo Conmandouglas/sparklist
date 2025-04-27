@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from "react";
 
-const EditTodo = ({ todo, fetchTodos, lists }) => {
+const EditTodo = ({ todo, fetchTodos, lists, color }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedListId, setSelectedListId] = useState(0);
+  const [remind_at, setRemind_at] = useState("");
 
   //use effect
   //if a todo, set the description to the todos description
   //in the brackets, include something (hint its the item)
+
+  function formatDateTimeLocal(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().slice(0,16);
+  }
+  
+
   useEffect(() => {
     if (todo) {
       setContent(todo.content);
       setTitle(todo.title);
-      setSelectedListId(todo.list_id); // Make sure the correct list is selected
+      setSelectedListId(todo.list_id);
+      setRemind_at(formatDateTimeLocal(todo.remind_at));
     }
   }, [todo]);
   
@@ -29,19 +41,26 @@ const EditTodo = ({ todo, fetchTodos, lists }) => {
   const updateContent = async (e) => {
     e.preventDefault();
     try {
-      const body = { title, content, list_id: selectedListId };
-      console.log("Updating Todo with Body:", body)
+      const body = {
+        title,
+        content,
+        list_id: selectedListId,
+        remind_at,
+        color, // <-- still send it even if they can't edit
+      };
+      console.log("Updating Todo with Body:", body);
       await fetch(`http://localhost:5001/todos/${todo.item_id}`, {
         method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(body)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
-
+  
       fetchTodos();
     } catch (err) {
       console.error(err.message);
     }
-  }
+  };
+  
 
 
   return (
@@ -112,6 +131,16 @@ const EditTodo = ({ todo, fetchTodos, lists }) => {
                   </option>
                 ))}
               </select>
+              <br></br>
+              <label className="form-label me-1">Remind At:</label>
+              <input
+                type="datetime-local"
+                value={remind_at}
+                onChange={(e) => {
+                  setRemind_at(e.target.value);
+                  console.log(`Remind at changed: ${e.target.value}`);
+                }}
+              />
             </div>
 
             <div className="modal-footer">

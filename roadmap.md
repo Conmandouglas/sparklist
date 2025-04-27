@@ -35,9 +35,10 @@
     website a weird orange to add my own identity
 [] Add the ability to make it remind the user by sending notification
 https://www.youtube.com/watch?v=0-bSQ14H_PY
-  [] Ask user for permission to send notifications
-  [] If there is still todos at 5:00 each day (their local time), say the day is wrapping up, be sure to check your todos
-  [] On note creation screen, add abilility to add a time to remind
+  [4/26/2025 9:59pm] Ask user for permission to send notifications
+  [4/26/2025 9:59pm] If there is still todos at 5:00 each day (their local time), say the day is wrapping up, be sure to check your todos
+  [4/26/2025 9:59pm] On note creation screen, add abilility to add a time to remind
+  [] Add ability to edit remind at time
 [] Add multi-user support (review some authentication)
   [] Have a basic auto generated profile pic (different for each user) at the top of hamburger menu and then a sign in/out
     - maybe in top right corner of screen?
