@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import pool from "./db.js";
 import * as dotenv from 'dotenv';
+import PushNotifications from 'node-pushnotifications';
 
 //Idea:
 //items are called "do's",
@@ -11,6 +12,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
+const publicVapidKey = process.env.VAPID_PUBLIC_KEY;
+const privateVapidKey = process.env.VAPID_PRIVATE_KEY;
 
 //MIDDLEWARE
 app.use(cors());
@@ -21,22 +24,27 @@ app.use(express.json());
 //create a todo
 app.post('/todos', async (req, res) => {
   try {
-    const { title, content, color, importance, list_id } = req.body;
-    
+    const { title, content, color, importance, list_id, remind_at } = req.body;
+    console.log("Received remind_at:", remind_at);
+
+    // Validate input data
     if (!title || !content || isNaN(importance) || isNaN(list_id)) {
       return res.status(400).json({ error: "Invalid input." });
-    }  
-    
-    // Ensure importance is an integer
+    }
+
+    // Ensure importance is an integer, default to 3 if not provided
     const importanceValue = importance ? parseInt(importance) : 3;
 
+    // Insert into the database, setting remind_at to null if not provided
     const newItem = await pool.query(
-      "INSERT INTO items (title, content, color, importance, list_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [title, content, color, importanceValue, list_id]
+      "INSERT INTO items (title, content, color, importance, list_id, remind_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [title, content, color, importanceValue, list_id, remind_at || null]
     );
+
+    // Ensure list_id exists and is valid
     if (!list_id) {
       return res.status(400).json({ error: "Missing list_id" });
-    }    
+    }
 
     res.json(newItem.rows[0]);
   } catch (err) {
@@ -44,6 +52,7 @@ app.post('/todos', async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 
 //get all todos
@@ -176,11 +185,11 @@ app.get('/todos/:id', async (req, res) => {
 app.put('/todos/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, color, importance, list_id } = req.body;
+    const { title, content, color, importance, list_id, remind_at } = req.body;
   
     const newTodo = await pool.query(
-      "UPDATE items SET title = $1, content = $2, color = $3, importance = $4, list_id = $5 WHERE item_id = $6",
-      [title, content, color, importance, list_id, id]
+      "UPDATE items SET title = $1, content = $2, color = $3, importance = $4, list_id = $5, remind_at = $6 WHERE item_id = $7",
+      [title, content, color, importance, list_id, remind_at, id]
     );
     res.json("Item has been updated.")
   } catch (err) {

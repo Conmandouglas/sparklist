@@ -26,17 +26,18 @@
 [4/11/2024 9:11AM] Sort notes through lists **will take some time to implement**
   [4/8/2025] Add a sidebar hamburger menu
   [4/11/2025 9:11AM] Add ability to have multiple notes lists
-[] Small fun features to add to the overall experience
+[4/19/2025 10:20am] Small fun features to add to the overall experience
   [4/17/2025 6:51pm] Add a toggle dark theme button
     [4/16/2025 5:00pm] Add basic website dark mode functionality
     [4/17/2025 6:51pm] Change backend so hard coded color code does not save in backend
   [4/17/2025 7:01pm] Add a sound when the user creates a note
-  [] Make new fonts and colors without making like the whole
+  [4/19/2025 10:20am] Make new fonts and colors without making like the whole
     website a weird orange to add my own identity
 [] Add the ability to make it remind the user by sending notification
+https://www.youtube.com/watch?v=0-bSQ14H_PY
   [] Ask user for permission to send notifications
+  [] If there is still todos at 5:00 each day (their local time), say the day is wrapping up, be sure to check your todos
   [] On note creation screen, add abilility to add a time to remind
-  [] Once created, it will display it on the home screen until the creator
 [] Add multi-user support (review some authentication)
   [] Have a basic auto generated profile pic (different for each user) at the top of hamburger menu and then a sign in/out
     - maybe in top right corner of screen?
@@ -46,8 +47,9 @@
 [] Long stretch features (not guarunteed to make it)
   [CANCELED] Add ability to drag and drop notes
   *drag and drop canceled due to the "importance" feature being more user friendly*
+  [] Add Material UI
   [] Add the ability to import todos from Google Keep using API
   [] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
-[] Go back to drawing board, try to get inspiration off of other websites, and think of something unique maybe
- - learn how to make a simplistic but modern website that is looking good, and make website look professional but modern and simplistic, make it a bit more have character :)
 [] Give myself a huge pat on the back for taking on this project in a organized manner :)
+
+learn how to make a simplistic but modern website that is looking good, and make website look professional but modern and simplistic, make it a bit more have character :)

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import TodoInput from './components/TodoInput.js';
 import TodoList from './components/TodoList.js';
 import Navigation from "./components/Nav.js";
+import Push from 'push.js';
 
 function App() {
   const [lists, setLists] = useState([]);
@@ -14,26 +15,54 @@ function App() {
     name: "Loading...  (if taking too long, please refresh the page)"
   });
   const [audioEnabled, setAudioEnabled] = useState([true]);
+  const publicVapidKey = "BMflZggYJziEpJHQQ5nA-tWUnUgcGVRA1z6mbNbDXX1RvZTTLu113nXvub2l57J8lTmuMefXd3li6RnAb85h5vA"; // REPLACE_WITH_YOUR_KEY
+
 
   const toggleAudio = () => {
     setAudioEnabled(!audioEnabled);
   }
-  
 
-useEffect(() => {
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-  console.log("System prefers light mode?", mediaQuery.matches);
-  setIsLightMode(mediaQuery.matches);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
+    console.log("System prefers light mode?", mediaQuery.matches);
+    setIsLightMode(mediaQuery.matches);
 
-  // Optional: Watch for changes
-  const handleChange = (e) => {
-    console.log("System theme changed. Now prefers light mode?", e.matches);
-    setIsLightMode(e.matches);
-  };
+    // Optional: Watch for changes
+    const handleChange = (e) => {
+      console.log("System theme changed. Now prefers light mode?", e.matches);
+      setIsLightMode(e.matches);
+    };
 
-  mediaQuery.addEventListener("change", handleChange);
-  return () => mediaQuery.removeEventListener("change", handleChange);
-}, []);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      todos.forEach(todo => {
+        if (
+          todo.remind_at &&
+          !todo.notified &&
+          new Date(todo.remind_at) <= now
+        ) {
+          Push.create(`Reminder: ${todo.title}`, {
+            body: todo.content || 'Time to check this off!',
+            icon: '/logo192.png',
+            timeout: 6000,
+            onClick: () => {
+              window.focus();
+              this?.close?.();
+            }
+          });
+
+          todo.notified = true; // Prevent duplicates during this session
+        }
+      })
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [todos])
 
 
   const colorMap = {
