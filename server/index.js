@@ -21,6 +21,21 @@ app.use(express.json());
 
 //ROUTES//
 
+
+///T0DOS/
+//get all todos
+app.get('/todos', async (req, res) => {
+  try {
+    const items = await pool.query(
+      "SELECT * FROM items ORDER BY pinned DESC, importance DESC, item_id DESC"
+    );
+    res.json(items.rows); // Send as JSON array
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 //create a todo
 app.post('/todos', async (req, res) => {
   try {
@@ -53,135 +68,7 @@ app.post('/todos', async (req, res) => {
   }
 });
 
-
-
-//get all todos
-app.get('/todos', async (req, res) => {
-  try {
-    const items = await pool.query(
-      "SELECT * FROM items ORDER BY pinned DESC, importance DESC, item_id DESC"
-    );
-    res.json(items.rows); // Send as JSON array
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-//create a list
-app.post('/lists', async (req, res) => {
-  try {
-    const { listName } = req.body;
-
-    if (!listName) {
-      return res.status(400).json({ error: "List name is required" });
-    }
-
-    const newList = await pool.query(
-      "INSERT INTO lists (name) VALUES ($1) RETURNING *",
-      [listName]
-    );
-
-    res.json(newList.rows[0]);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-
-//get lists
-app.get('/lists', async (req, res) => {
-  try {
-    const lists = await pool.query(
-      "SELECT * FROM lists"
-    );
-
-    res.json(lists.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-//update a list name
-app.put('/lists/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    const newList = await pool.query(
-      "UPDATE lists SET name = $1 WHERE list_id = $2",
-      [name, id]
-    );
-
-    res.json("List name has been updated!")
-  } catch (err) {
-    console.error(err.message);
-  }
-});
-
-//get specific list
-app.get('/lists/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const list = await pool.query(
-      "SELECT * FROM items WHERE list_id = $1",
-      [ id ]
-    );
-
-    res.json(list.rows);
-  } catch (err) {
-    console.error(err.message);
-  }
-});
-
-app.delete('/lists/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const list = await pool.query(
-      'DELETE FROM lists WHERE list_id = $1',
-      [id]
-    );
-    res.json('List has been deleted');
-  } catch (err) {
-    console.error(err.message);
-    /*if (err.code === '23503') {
-      res.status(400).json({ error: 'There are open todos in this list. Please complete them first.'})
-    } else {
-      console.error("Full error object:", err);
-      res.status(500).send("Server error");
-    }*/
-  }
-})
-
-
-//get a specific todo
-//get a specific to do with a number in url
-//get the id from the url
-//get todo using query, selecting all where id is equal
-//send to json
-app.get('/todos/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const todo = await pool.query(
-      "SELECT * FROM items WHERE item_id = $1",
-      [id]
-    );
-    res.json(todo.rows[0]);
-  } catch (err) {
-    console.error(err.message);
-  }
-})
-
 //update a todo
-//get the id from the url
-//get title and content from body
-//make a query for updated todo
-//update items to set the title equal to , and description equal to
-//then sent response saying it was updated
 app.put('/todos/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -195,12 +82,23 @@ app.put('/todos/:id', async (req, res) => {
   } catch (err) {
     console.error(err.message);
   }
-})
+});
+
+//get a specific todo
+app.get('/todos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await pool.query(
+      "SELECT * FROM items WHERE item_id = $1",
+      [id]
+    );
+    res.json(todo.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 //delete a todo
-//get id from url
-//query from table where its the id
-//sent response saying it was delted
 app.delete('/todos/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -214,6 +112,7 @@ app.delete('/todos/:id', async (req, res) => {
   }
 })
 
+//pin a todo (update the pinned column in a todo item)
 app.put("/todos/:id/pin", async (req, res) => {
   try {
     const { id } = req.params;
@@ -253,6 +152,135 @@ app.put("/todos/:id/pin", async (req, res) => {
     console.error(err.message);
     res.status(500).json({ error: "Server error" });
   }
+});
+
+//LISTS//
+
+//get lists
+app.get('/lists', async (req, res) => {
+  try {
+    const lists = await pool.query(
+      "SELECT * FROM lists"
+    );
+
+    res.json(lists.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//get specific list
+app.get('/lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const list = await pool.query(
+      "SELECT * FROM items WHERE list_id = $1",
+      [ id ]
+    );
+
+    res.json(list.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+//create a list
+app.post('/lists', async (req, res) => {
+  try {
+    const { listName } = req.body;
+
+    if (!listName) {
+      return res.status(400).json({ error: "List name is required" });
+    }
+
+    const newList = await pool.query(
+      "INSERT INTO lists (name) VALUES ($1) RETURNING *",
+      [listName]
+    );
+
+    res.json(newList.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//update a list name
+app.put('/lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const newList = await pool.query(
+      "UPDATE lists SET name = $1 WHERE list_id = $2",
+      [name, id]
+    );
+
+    res.json("List name has been updated!")
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.delete('/lists/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const list = await pool.query(
+      'DELETE FROM lists WHERE list_id = $1',
+      [id]
+    );
+    res.json('List has been deleted');
+  } catch (err) {
+    console.error(err.message);
+    /*if (err.code === '23503') {
+      res.status(400).json({ error: 'There are open todos in this list. Please complete them first.'})
+    } else {
+      console.error("Full error object:", err);
+      res.status(500).send("Server error");
+    }*/
+  }
+});
+
+//USER LOGIN & AUTH//
+
+//get all users
+app.get('/users', (req, res) => {
+  //get a list of all users
+});
+
+//get info for a specific user
+app.get('/users/:id', (req, res) => {
+  //get a list of all users
+});
+
+app.get('/register', (req, res) => {
+
+});
+
+app.post('/register', (req, res) => {
+
+});
+
+app.get('/login', (req, res) => {
+
+});
+
+app.post('/login', (req, res) => {
+
+});
+
+//update a user
+app.put('/users', (req, res) => {
+  //edit a users username
+  //later add ability to create a new password
+})
+
+//delete a user
+app.delete('/users', (req, res) => {
+
 });
 
 //SERVER SETUP//
