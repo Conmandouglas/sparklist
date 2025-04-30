@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import ListItem from './ListItem.js';
 import ModeToggle from "./ModeToggle.js";
 import AudioToggle from "./AudioToggle.js";
-
+import LoginUser from "./LoginUser.js";
+import SignUp from "./SignUp.js";
 
 function Navigation({
   isSidebarOpen,
@@ -18,6 +19,7 @@ function Navigation({
 }) {
   const [listName, setListName] = useState("");
   const [showAddList, setShowAddList] = useState(false);
+  const [view, setView] = useState("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -191,7 +193,7 @@ function Navigation({
   return (
     <div>
       <nav
-        className="navbar position-fixed top-0 start-0 w-100 d-flex flex-column align-items-start px-3"
+        className="navbar position-fixed top-0 start-0 w-100 d-flex align-items-center justify-content-between px-3"
         style={{
           height: "50px",
           zIndex: "1050",
@@ -199,16 +201,55 @@ function Navigation({
           color: isLightMode ? "#000" : "#FFD700",
         }}
       >
-        <button
-          className={`btn me-3 ${
-            isLightMode ? "btn-outline-dark" : "btn-outline-light"
-          }`}
-          onClick={toggleSidebar}
-          style={{ fontSize: "20px", padding: "3px 8px", lineHeight: "1" }}
+        {/* Left: Sidebar toggle and title */}
+        <div className="d-flex align-items-center">
+          <button
+            className={`btn me-3 ${
+              isLightMode ? "btn-outline-dark" : "btn-outline-light"
+            }`}
+            onClick={toggleSidebar}
+            style={{ fontSize: "20px", padding: "3px 8px", lineHeight: "1" }}
+          >
+            ☰
+          </button>
+          <h5 className="mb-0">Spark Todos</h5>
+        </div>
+
+        {/* Right: Log In / Sign Up buttons */}
+        <div
+          className="d-flex align-items-center me-2"
         >
-          ☰
-        </button>
-        <h5 className="mb-0">Spark Todos</h5>
+          <button
+            onClick={() => setView("login")}
+            className="btn btn-secondary btn-sm me-2"
+          >
+            Log In
+          </button>
+          <button
+            onClick={() => setView("signup")}
+            className="btn btn-secondary btn-sm"
+          >
+            Sign Up
+          </button>
+        </div>
+
+        {/* View box (optional) */}
+        {view && (
+          <div
+            style={{
+              position: "absolute",
+              top: 60,
+              right: 20,
+              padding: "1rem",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              backgroundColor: "#f9f9f9",
+            }}
+          >
+            {view === "login" && <LoginUser />}
+            {view === "signup" && <SignUp />}
+          </div>
+        )}
       </nav>
 
       <div

@@ -29,3 +29,17 @@ INSERT INTO items (title, content, importance, pinned, color, list_id)
 VALUES ('Test Todo for List 2', 'This is a test task under list 2.', 2, false, '#f0f0f0', 2);
 
 ALTER TABLE items ADD COLUMN remind_at TIMESTAMP;
+
+/*USERS FEATURE*/
+
+CREATE TABLE users(
+  user_id BIGSERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  email VARCHAR(200) NOT NULL,
+  password VARCHAR(200) NOT NULL,
+  UNIQUE (email)
+);
+/*use \d users to see the info on table*/
+
+
+/*after like 15 characters, make it so it has ... when displayed*/
