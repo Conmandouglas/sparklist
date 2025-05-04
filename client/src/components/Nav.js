@@ -15,7 +15,9 @@ function Navigation({
   isLightMode,
   setIsLightMode,
   toggleAudio,
-  audioEnabled
+  audioEnabled,
+  currentUser,
+  setCurrentUser
 }) {
   const [listName, setListName] = useState("");
   const [showAddList, setShowAddList] = useState(false);
@@ -216,21 +218,30 @@ function Navigation({
         </div>
 
         {/* Right: Log In / Sign Up buttons */}
-        <div
-          className="d-flex align-items-center me-2"
-        >
-          <button
-            onClick={() => setView("login")}
-            className="btn btn-secondary btn-sm me-2"
-          >
-            Log In
-          </button>
-          <button
-            onClick={() => setView("signup")}
-            className="btn btn-secondary btn-sm"
-          >
-            Sign Up
-          </button>
+        <div className="d-flex align-items-center me-2">
+          {currentUser ? (
+            <>
+              <span style={{ marginRight: "10px" }}>Hello, {currentUser.name}</span>
+              <a href="/users/logout" className="btn btn-danger btn-sm">
+                Log Out
+              </a>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setView("login")}
+                className="btn btn-secondary btn-sm me-2"
+              >
+                Log In
+              </button>
+              <button
+                onClick={() => setView("signup")}
+                className="btn btn-secondary btn-sm"
+              >
+                Sign Up
+              </button>
+            </>
+          )}
         </div>
 
         {/* View box (optional) */}
@@ -243,11 +254,38 @@ function Navigation({
               padding: "1rem",
               border: "1px solid #ccc",
               borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
+              backgroundColor: isLightMode ? "#f9f9f9" : "#1c1c1c",
+              boxShadow: "6px 6px rgba(0, 0, 0, 0.5)",
+              zIndex: 1100,
             }}
           >
-            {view === "login" && <LoginUser />}
-            {view === "signup" && <SignUp />}
+            <button
+              onClick={() => setView("")}
+              style={{
+                position: "absolute",
+                top: "5px",
+                right: "5px",
+                border: "none",
+                background: "none",
+                fontSize: "25px",
+                fontWeight: "bold",
+                color: isLightMode ? "#000" : "#fff",
+                cursor: "pointer",
+              }}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            {view === "login" && <LoginUser isLightMode={isLightMode} />}
+            {view === "signup" && (
+              <SignUp
+                isLightMode={isLightMode}
+                onRegisterSuccess={(user) => {
+                  setCurrentUser(user); // Save the user in Navigation
+                  setView(""); // Hide modal
+                }}
+              />
+            )}
           </div>
         )}
       </nav>

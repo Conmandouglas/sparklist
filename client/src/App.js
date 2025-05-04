@@ -15,7 +15,8 @@ function App() {
     name: "Loading...  (if taking too long, please refresh the page)"
   });
   const [audioEnabled, setAudioEnabled] = useState([true]);
-  const publicVapidKey = "BMflZggYJziEpJHQQ5nA-tWUnUgcGVRA1z6mbNbDXX1RvZTTLu113nXvub2l57J8lTmuMefXd3li6RnAb85h5vA"; // REPLACE_WITH_YOUR_KEY
+  const publicVapidKey = "BMflZggYJziEpJHQQ5nA-tWUnUgcGVRA1z6mbNbDXX1RvZTTLu113nXvub2l57J8lTmuMefXd3li6RnAb85h5vA"; 
+  const [currentUser, setCurrentUser] = useState(null);
 
 
   const toggleAudio = () => {
@@ -202,6 +203,8 @@ function App() {
         setIsLightMode={setIsLightMode}
         toggleAudio={toggleAudio}
         audioEnabled={audioEnabled}
+        currentUser={currentUser}
+        setCurrentUser={setCurrentUser}
       />
       <div className={`main-content ${isSidebarOpen ? "with-sidebar" : ""}`}>
         <TodoInput

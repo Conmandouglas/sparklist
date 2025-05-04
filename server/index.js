@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import pool from "./db.js";
 import * as dotenv from 'dotenv';
-import PushNotifications from 'node-pushnotifications';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
+import flash from 'express-flash';
 
 //Idea:
 //items are called "do's",
@@ -18,6 +20,15 @@ const privateVapidKey = process.env.VAPID_PRIVATE_KEY;
 //MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(flash());
 
 //ROUTES//
 
@@ -256,9 +267,58 @@ app.get('/users/:id', (req, res) => {
   //get a list of all users
 });
 
-app.get('/register', (req, res) => {
+app.post('/users/register', async (req, res) => {
+  const { name, email, password, password2 } = req.body;
+  let errors = [];
 
+  // Basic validations
+  if (!name || !email || !password || !password2) {
+    errors.push({ message: "Please enter all fields" });
+  }
+  if (password.length < 6) {
+    errors.push({ message: "Password should be at least 6 characters" });
+  }
+  if (password !== password2) {
+    errors.push({ message: "Passwords do not match" });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  try {
+    const userExists = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ errors: [{ message: "User already exists." }] });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await pool.query(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING user_id, name, email",
+      [name, email, hashedPassword]
+    );
+
+    // Send back success response with user data
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        user_id: newUser.rows[0].user_id,
+        name: newUser.rows[0].name,
+        email: newUser.rows[0].email
+      }
+    });
+
+  } catch (err) {
+    console.error("Registration error:", err.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
+
 
 app.post('/register', (req, res) => {
 
