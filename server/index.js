@@ -5,6 +5,10 @@ import * as dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
 import flash from 'express-flash';
+import passport from 'passport';
+import initializePassport from './passportConfig.js';
+initializePassport(passport);
+
 
 //Idea:
 //items are called "do's",
@@ -18,15 +22,26 @@ const publicVapidKey = process.env.VAPID_PUBLIC_KEY;
 const privateVapidKey = process.env.VAPID_PRIVATE_KEY;
 
 //MIDDLEWARE
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", // your frontend URL
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(session({
   secret: 'secret',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true, // Makes sure the cookie cannot be accessed via JavaScript
+    secure: process.env.NODE_ENV === 'production', // Set to true in production if using HTTPS
+    maxAge: 1000 * 60 * 60 * 24, // Cookie expiry (e.g., 24 hours)
+  }
 }));
+
+app.use(passport.initialize()); // ✅ Must call the function
+app.use(passport.session());    // ✅ Must call the function
 
 app.use(flash());
 
@@ -319,24 +334,65 @@ app.post('/users/register', async (req, res) => {
   }
 });
 
-
-app.post('/register', (req, res) => {
-
+app.post('/users/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      console.error('Authentication error:', err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    if (!user) {
+      // Authentication failed
+      return res.status(401).json({ errors: [{ message: info.message || 'Invalid credentials' }] });
+    }
+    // Authentication succeeded
+    req.logIn(user, (err) => {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({ error: 'Login failed' });
+      }
+      return res.status(200).json({
+        message: 'Login successful',
+        user: {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email
+        }
+      });      
+    });
+  })(req, res, next);
 });
 
-app.get('/login', (req, res) => {
+//for a forgot password button, maybe also edit username button
+app.put('/users/editname', async (req, res) => {
+  const { newName, user_id } = req.body;
 
+  // Debugging: Check what is coming in the request
+  console.log("Received newName:", newName);
+  console.log("Received user_id:", user_id);
+
+  if (!newName || !user_id) {
+    return res.status(400).json({ error: "Missing newName or user_id" });
+  }
+
+  try {
+    const updatedUser = await pool.query(
+      "UPDATE users SET name = $1 WHERE user_id = $2 RETURNING *",
+      [newName, user_id]
+    );
+
+    if (updatedUser.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ name: updatedUser.rows[0].name });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
-app.post('/login', (req, res) => {
 
-});
 
-//update a user
-app.put('/users', (req, res) => {
-  //edit a users username
-  //later add ability to create a new password
-})
 
 //delete a user
 app.delete('/users', (req, res) => {

@@ -19,9 +19,23 @@ function Navigation({
   currentUser,
   setCurrentUser
 }) {
+  console.log("Navigation rendered");
+  console.log("Props - currentUser:", currentUser);
+  console.log("Props - lists:", lists);
+  console.log("Props - isSidebarOpen:", isSidebarOpen);
+  console.log("Props - isLightMode:", isLightMode);
   const [listName, setListName] = useState("");
   const [showAddList, setShowAddList] = useState(false);
   const [view, setView] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState(currentUser?.name || "");
+  console.log("Initial listName:", listName);
+  console.log("Initial showAddList:", showAddList);
+  console.log("Initial view:", view);
+  console.log("Initial showUserMenu:", showUserMenu);
+  console.log("Initial isEditingUsername:", isEditingUsername);
+  console.log("Initial newUsername:", newUsername);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,54 +51,140 @@ function Navigation({
     fetchLists();
   }, []);
 
+  useEffect(() => {
+    console.log("Current User updated:", currentUser);
+  }, [currentUser]);  
+
+// Check if currentUser has the correct data
+console.log("currentUser:", currentUser);  // Should show { name: 'kangaroo', user_id: '6', email: 'kangaroo@gmail.com' }
+
+const handleUsernameSubmit = async (e) => {
+  e.preventDefault();
+
+  // Ensure the user_id is being passed
+  if (!currentUser?.user_id) {
+    console.error("User ID is missing");
+    return;
+  }
+
+  const newName = newUsername;
+  const userId = currentUser.user_id;  // Ensure this is correctly set
+
+  console.log("Submitting newName:", newName);
+  console.log("user_id:", userId);
+
+  try {
+    const response = await fetch('http://localhost:5001/users/editname', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        newName: newName,
+        user_id: userId,  // Pass the user_id here
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      // Handle success
+      console.log("Username updated:", data);
+
+      // Update the currentUser state with the new username
+      setCurrentUser(prevState => ({
+        ...prevState,
+        name: newName,
+      }));
+
+      // Optionally, update localStorage as well to reflect the change
+      localStorage.setItem('user', JSON.stringify({ ...currentUser, name: newName }));
+    } else {
+      // Handle error
+      console.error("Error:", data.error);
+    }
+  } catch (err) {
+    console.error("Request failed:", err);
+  }
+};
+
+  const onLoginSuccess = (user) => {
+    console.log("Login Success. Received user:", user);
+    setCurrentUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    setView("");
+  };
+  
+  const onRegisterSuccess = (user) => {
+    console.log("Register Success. Received user:", user);
+    setCurrentUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    setView("");
+  };
+  
+
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Remove user from localStorage
+    setCurrentUser(null); // Update the state
+    // Additional logout logic (like redirecting to login page)
+    setShowUserMenu(false); // Close user menu
+  };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    console.log("Stored user from localStorage:", storedUser);
+  
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      console.log("Parsed user:", parsedUser);
+      setCurrentUser(parsedUser);
+      setNewUsername(parsedUser.name);
+    }
+  }, []);
+  
+
+  useEffect(() => {
+    console.log("Current User:", currentUser);
+  }, [currentUser]);
+
   const toggleMode = () => {
     setIsLightMode(!isLightMode);
   };
 
   const fetchLists = async () => {
     try {
+      console.log("Fetching lists from backend...");
       const response = await fetch("http://localhost:5001/lists");
       const data = await response.json();
       setLists(data);
-      console.log("Fetched Lists:", data);
+      console.log("Fetched lists:", data);
     } catch (err) {
-      console.error(err.message);
+      console.error("Failed to fetch lists:", err.message);
     }
   };
+  
 
   const goToList = async (list_id) => {
+    console.log("Navigating to list:", list_id);
     try {
       const response = await fetch(`http://localhost:5001/lists/${list_id}`);
       const listTodos = await response.json();
+      console.log("Fetched list todos:", listTodos);
       handleListSelect(listTodos);
-
+  
       const selectedList = lists.find((list) => list.list_id === list_id);
+      console.log("Selected list object:", selectedList);
+  
       if (selectedList) {
         setCurrentList({
           list_id: selectedList.list_id,
           name: selectedList.name,
         });
       }
-      console.log("Fetching list:", list_id);
-      console.log("List todos:", listTodos);
     } catch (err) {
-      console.error(err.message);
+      console.error("Error fetching list todos:", err.message);
     }
   };
-
-  const goToAllTodos = async () => {
-    try {
-      const response = await fetch("http://localhost:5001/todos");
-      const allTodos = await response.json();
-      handleListSelect(allTodos);
-      setCurrentList({
-        list_id: "",
-        name: "All Todos",
-      });
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
+  
 
   const listButton = async () => {
     setShowAddList(!showAddList);
@@ -221,10 +321,14 @@ function Navigation({
         <div className="d-flex align-items-center me-2">
           {currentUser ? (
             <>
-              <span style={{ marginRight: "10px" }}>Hello, {currentUser.name}</span>
-              <a href="/users/logout" className="btn btn-danger btn-sm">
-                Log Out
-              </a>
+              <button
+                className="btn"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <span style={{ marginRight: "10px" }}>
+                  Hello, {currentUser.name} ▼
+                </span>
+              </button>
             </>
           ) : (
             <>
@@ -241,6 +345,61 @@ function Navigation({
                 Sign Up
               </button>
             </>
+          )}
+
+          {showUserMenu && (
+            <div
+              style={{
+                position: "absolute",
+                top: "60px",
+                right: "25px", // Adjust based on your layout
+                padding: "0.75rem",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                backgroundColor: isLightMode ? "#f9f9f9" : "#2c2c2c",
+                boxShadow: "6px 6px rgba(0, 0, 0, 0.3)",
+                zIndex: 1100,
+                minWidth: "150px",
+              }}
+            >
+              <div style={{ marginBottom: "0.5rem" }}>
+                <strong>{currentUser ? currentUser.name : "Guest"}</strong>
+              </div>
+              {isEditingUsername ? (
+                <form onSubmit={handleUsernameSubmit}>
+                  <input
+                    type="text"
+                    className="form-control mb-2"
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    placeholder="New username"
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm w-100 mb-1"
+                  >
+                    Change Username
+                  </button>
+                </form>
+              ) : (
+                <button
+                  className="btn btn-outline-secondary btn-sm w-100 mb-1"
+                  onClick={() => {
+                    setNewUsername(currentUser.name);
+                    setIsEditingUsername(true);
+                  }}
+                >
+                  Edit Username
+                </button>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="btn btn-danger btn-sm w-100"
+              >
+                Log Out
+              </button>
+            </div>
           )}
         </div>
 
@@ -276,15 +435,9 @@ function Navigation({
             >
               ×
             </button>
-            {view === "login" && <LoginUser isLightMode={isLightMode} />}
+            {view === "login" && <LoginUser onLoginSuccess={onLoginSuccess} />}
             {view === "signup" && (
-              <SignUp
-                isLightMode={isLightMode}
-                onRegisterSuccess={(user) => {
-                  setCurrentUser(user); // Save the user in Navigation
-                  setView(""); // Hide modal
-                }}
-              />
+              <SignUp onRegisterSuccess={onRegisterSuccess} />
             )}
           </div>
         )}
