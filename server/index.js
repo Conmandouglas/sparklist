@@ -2,7 +2,13 @@ import express from "express";
 import cors from "cors";
 import pool from "./db.js";
 import * as dotenv from 'dotenv';
-import PushNotifications from 'node-pushnotifications';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
+import flash from 'express-flash';
+import passport from 'passport';
+import initializePassport from './passportConfig.js';
+initializePassport(passport);
+
 
 //Idea:
 //items are called "do's",
@@ -16,8 +22,28 @@ const publicVapidKey = process.env.VAPID_PUBLIC_KEY;
 const privateVapidKey = process.env.VAPID_PRIVATE_KEY;
 
 //MIDDLEWARE
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", // your frontend URL
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true, // Makes sure the cookie cannot be accessed via JavaScript
+    secure: process.env.NODE_ENV === 'production', // Set to true in production if using HTTPS
+    maxAge: 1000 * 60 * 60 * 24, // Cookie expiry (e.g., 24 hours)
+  }
+}));
+
+app.use(passport.initialize()); // ✅ Must call the function
+app.use(passport.session());    // ✅ Must call the function
+
+app.use(flash());
 
 //ROUTES//
 
@@ -25,21 +51,32 @@ app.use(express.json());
 ///T0DOS/
 //get all todos
 app.get('/todos', async (req, res) => {
+  const { user_id, list_id } = req.query;
+
+  // Check if user_id and list_id are provided
+  if (!user_id || !list_id) {
+    return res.status(400).json({ error: "Missing user_id or list_id" });
+  }
+
   try {
+    // Query todos for a specific user and list
     const items = await pool.query(
-      "SELECT * FROM items ORDER BY pinned DESC, importance DESC, item_id DESC"
+      "SELECT * FROM items WHERE user_id = $1 AND list_id = $2 ORDER BY pinned DESC, importance DESC, item_id DESC",
+      [user_id, list_id]
     );
-    res.json(items.rows); // Send as JSON array
+    
+    res.json(items.rows); // Send the todos as a JSON array
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Server error" });
   }
 });
 
+
 //create a todo
 app.post('/todos', async (req, res) => {
   try {
-    const { title, content, color, importance, list_id, remind_at } = req.body;
+    const { title, content, color, importance, list_id, remind_at, user_id } = req.body;
     console.log("Received remind_at:", remind_at);
 
     // Validate input data
@@ -52,8 +89,8 @@ app.post('/todos', async (req, res) => {
 
     // Insert into the database, setting remind_at to null if not provided
     const newItem = await pool.query(
-      "INSERT INTO items (title, content, color, importance, list_id, remind_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [title, content, color, importanceValue, list_id, remind_at || null]
+      "INSERT INTO items (title, content, color, importance, list_id, remind_at, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [title, content, color, importanceValue, list_id, remind_at, user_id || null]
     );
 
     // Ensure list_id exists and is valid
@@ -158,9 +195,16 @@ app.put("/todos/:id/pin", async (req, res) => {
 
 //get lists
 app.get('/lists', async (req, res) => {
+  const { user_id } = req.query;
+
+  if (!user_id) {
+    return res.status(400).json({ error: "Missing user_id" });
+  }
+  
   try {
     const lists = await pool.query(
-      "SELECT * FROM lists"
+      "SELECT * FROM lists WHERE user_id = $1",
+      [user_id]
     );
 
     res.json(lists.rows);
@@ -186,18 +230,18 @@ app.get('/lists/:id', async (req, res) => {
   }
 });
 
-//create a list
+// Create a list (now supports user_id)
 app.post('/lists', async (req, res) => {
   try {
-    const { listName } = req.body;
+    const { listName, user_id } = req.body;
 
-    if (!listName) {
-      return res.status(400).json({ error: "List name is required" });
+    if (!listName || !user_id) {
+      return res.status(400).json({ error: "List name and user_id are required" });
     }
 
     const newList = await pool.query(
-      "INSERT INTO lists (name) VALUES ($1) RETURNING *",
-      [listName]
+      "INSERT INTO lists (name, user_id) VALUES ($1, $2) RETURNING *",
+      [listName, user_id]
     );
 
     res.json(newList.rows[0]);
@@ -206,6 +250,7 @@ app.post('/lists', async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 //update a list name
 app.put('/lists/:id', async (req, res) => {
@@ -246,41 +291,124 @@ app.delete('/lists/:id', async (req, res) => {
 
 //USER LOGIN & AUTH//
 
-//get all users
-app.get('/users', (req, res) => {
-  //get a list of all users
+app.post('/users/register', async (req, res) => {
+  const { name, email, password, password2 } = req.body;
+  let errors = [];
+
+  // Basic validations
+  if (!name || !email || !password || !password2) {
+    errors.push({ message: "Please enter all fields" });
+  }
+  if (password.length < 6) {
+    errors.push({ message: "Password should be at least 6 characters" });
+  }
+  if (password !== password2) {
+    errors.push({ message: "Passwords do not match" });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  try {
+    const userExists = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ errors: [{ message: "User already exists." }] });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await pool.query(
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING user_id, name, email",
+      [name, email, hashedPassword]
+    );
+
+    // Create a default list for the new user
+    const defaultListName = "Default List"; // Default list name
+    const userId = newUser.rows[0].user_id;
+
+    // Insert the default list into the database
+    const newList = await pool.query(
+      "INSERT INTO lists (name, user_id) VALUES ($1, $2) RETURNING list_id, name",
+      [defaultListName, userId]
+    );
+
+    // Send back success response with user data and the default list
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        user_id: newUser.rows[0].user_id,
+        name: newUser.rows[0].name,
+        email: newUser.rows[0].email,
+      },
+      defaultList: newList.rows[0]  // Include the default list
+    });
+
+  } catch (err) {
+    console.error("Registration error:", err.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-//get info for a specific user
-app.get('/users/:id', (req, res) => {
-  //get a list of all users
+app.post('/users/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      console.error('Authentication error:', err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    if (!user) {
+      // Authentication failed
+      return res.status(401).json({ errors: [{ message: info.message || 'Invalid credentials' }] });
+    }
+    // Authentication succeeded
+    req.logIn(user, (err) => {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({ error: 'Login failed' });
+      }
+      return res.status(200).json({
+        message: 'Login successful',
+        user: {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email
+        }
+      });      
+    });
+  })(req, res, next);
 });
 
-app.get('/register', (req, res) => {
+//for a forgot password button, maybe also edit username button
+app.put('/users/editname', async (req, res) => {
+  const { newName, user_id } = req.body;
 
-});
+  // Debugging: Check what is coming in the request
+  console.log("Received newName:", newName);
+  console.log("Received user_id:", user_id);
 
-app.post('/register', (req, res) => {
+  if (!newName || !user_id) {
+    return res.status(400).json({ error: "Missing newName or user_id" });
+  }
 
-});
+  try {
+    const updatedUser = await pool.query(
+      "UPDATE users SET name = $1 WHERE user_id = $2 RETURNING *",
+      [newName, user_id]
+    );
 
-app.get('/login', (req, res) => {
+    if (updatedUser.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-});
-
-app.post('/login', (req, res) => {
-
-});
-
-//update a user
-app.put('/users', (req, res) => {
-  //edit a users username
-  //later add ability to create a new password
-})
-
-//delete a user
-app.delete('/users', (req, res) => {
-
+    res.status(200).json({ name: updatedUser.rows[0].name });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 //SERVER SETUP//
