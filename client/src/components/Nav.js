@@ -19,23 +19,12 @@ function Navigation({
   currentUser,
   setCurrentUser
 }) {
-  console.log("Navigation rendered");
-  console.log("Props - currentUser:", currentUser);
-  console.log("Props - lists:", lists);
-  console.log("Props - isSidebarOpen:", isSidebarOpen);
-  console.log("Props - isLightMode:", isLightMode);
   const [listName, setListName] = useState("");
   const [showAddList, setShowAddList] = useState(false);
   const [view, setView] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState(currentUser?.name || "");
-  console.log("Initial listName:", listName);
-  console.log("Initial showAddList:", showAddList);
-  console.log("Initial view:", view);
-  console.log("Initial showUserMenu:", showUserMenu);
-  console.log("Initial isEditingUsername:", isEditingUsername);
-  console.log("Initial newUsername:", newUsername);
 
   useEffect(() => {
     const handleResize = () => {
@@ -52,129 +41,86 @@ function Navigation({
   }, []);
 
   useEffect(() => {
-    console.log("Current User updated:", currentUser);
-  }, [currentUser]);  
-
-// Check if currentUser has the correct data
-console.log("currentUser:", currentUser);  // Should show { name: 'kangaroo', user_id: '6', email: 'kangaroo@gmail.com' }
-
-const handleUsernameSubmit = async (e) => {
-  e.preventDefault();
-
-  // Ensure the user_id is being passed
-  if (!currentUser?.user_id) {
-    console.error("User ID is missing");
-    return;
-  }
-
-  const newName = newUsername;
-  const userId = currentUser.user_id;  // Ensure this is correctly set
-
-  console.log("Submitting newName:", newName);
-  console.log("user_id:", userId);
-
-  try {
-    const response = await fetch('http://localhost:5001/users/editname', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        newName: newName,
-        user_id: userId,  // Pass the user_id here
-      }),
-    });
-
-    const data = await response.json();
-    if (response.ok) {
-      // Handle success
-      console.log("Username updated:", data);
-
-      // Update the currentUser state with the new username
-      setCurrentUser(prevState => ({
-        ...prevState,
-        name: newName,
-      }));
-
-      // Optionally, update localStorage as well to reflect the change
-      localStorage.setItem('user', JSON.stringify({ ...currentUser, name: newName }));
-    } else {
-      // Handle error
-      console.error("Error:", data.error);
-    }
-  } catch (err) {
-    console.error("Request failed:", err);
-  }
-};
-
-  const onLoginSuccess = (user) => {
-    console.log("Login Success. Received user:", user);
-    setCurrentUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    setView("");
-  };
-  
-  const onRegisterSuccess = (user) => {
-    console.log("Register Success. Received user:", user);
-    setCurrentUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    setView("");
-  };
-  
-
-  const handleLogout = () => {
-    localStorage.removeItem("user"); // Remove user from localStorage
-    setCurrentUser(null); // Update the state
-    // Additional logout logic (like redirecting to login page)
-    setShowUserMenu(false); // Close user menu
-  };
-
-  useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    console.log("Stored user from localStorage:", storedUser);
-  
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      console.log("Parsed user:", parsedUser);
       setCurrentUser(parsedUser);
       setNewUsername(parsedUser.name);
     }
   }, []);
-  
 
-  useEffect(() => {
-    console.log("Current User:", currentUser);
-  }, [currentUser]);
+  const handleUsernameSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentUser?.user_id) return;
+
+    const newName = newUsername;
+    const userId = currentUser.user_id;
+
+    try {
+      const response = await fetch('http://localhost:5001/users/editname', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ newName, user_id: userId }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setCurrentUser(prev => ({ ...prev, name: newName }));
+        localStorage.setItem('user', JSON.stringify({ ...currentUser, name: newName }));
+      } else {
+        console.error("Error updating username:", data.error);
+      }
+    } catch (err) {
+      console.error("Username update failed:", err);
+    }
+  };
+
+  const onLoginSuccess = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    setView("");
+  };
+
+  const onRegisterSuccess = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    setView("");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+    setShowUserMenu(false);
+  };
 
   const toggleMode = () => {
     setIsLightMode(!isLightMode);
   };
 
   const fetchLists = async () => {
+    if (!currentUser) return;
     try {
-      console.log("Fetching lists from backend...");
-      const response = await fetch("http://localhost:5001/lists");
+      const response = await fetch(`http://localhost:5001/lists?user_id=${currentUser.user_id}`);
       const data = await response.json();
+      console.log("Fetched lists:", data);  // Log fetched lists
       setLists(data);
-      console.log("Fetched lists:", data);
     } catch (err) {
       console.error("Failed to fetch lists:", err.message);
     }
   };
-  
 
   const goToList = async (list_id) => {
-    console.log("Navigating to list:", list_id);
+    console.log("Navigating to list with ID:", list_id);  // Log the list ID
     try {
       const response = await fetch(`http://localhost:5001/lists/${list_id}`);
       const listTodos = await response.json();
-      console.log("Fetched list todos:", listTodos);
       handleListSelect(listTodos);
-  
+
       const selectedList = lists.find((list) => list.list_id === list_id);
-      console.log("Selected list object:", selectedList);
-  
       if (selectedList) {
+        console.log("Selected list:", selectedList);  // Log selected list details
         setCurrentList({
           list_id: selectedList.list_id,
           name: selectedList.name,
@@ -184,9 +130,8 @@ const handleUsernameSubmit = async (e) => {
       console.error("Error fetching list todos:", err.message);
     }
   };
-  
 
-  const listButton = async () => {
+  const listButton = () => {
     setShowAddList(!showAddList);
   };
 
@@ -198,42 +143,39 @@ const handleUsernameSubmit = async (e) => {
     }
 
     try {
-      setShowAddList(!showAddList);
-      const body = { listName };
-
+      setShowAddList(false);
       const response = await fetch("http://localhost:5001/lists", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ listName, user_id: currentUser?.user_id }),
       });
+
       if (response.ok) {
         fetchLists();
-        setListName(""); // Reset input field
+        setListName("");
       } else {
         const data = await response.json();
         alert(data.error || "Failed to create list");
       }
     } catch (err) {
-      console.error(err.message);
+      console.error("Error creating list:", err.message);
       alert("Something went wrong while creating the list.");
     }
   };
 
   const listDelete = async (list_id) => {
+    console.log("Deleting list with ID:", list_id);  // Log the list ID to be deleted
     try {
-      // Ensure list_id is valid
       if (!list_id) {
         alert("Invalid list ID");
         return;
       }
 
-      // Check if there is only one list
       if (lists.length === 1) {
         alert("You are unable to delete this list. It is your only list.");
         return;
       }
 
-      // Check for any todos in the list
       const todosResponse = await fetch("http://localhost:5001/todos");
       const todos = await todosResponse.json();
       const todosToDelete = todos.filter((todo) => todo.list_id === list_id);
@@ -242,41 +184,29 @@ const handleUsernameSubmit = async (e) => {
         const confirmDeleteTodos = window.confirm(
           "This list contains todos. Do you want to delete them along with the list?"
         );
-        if (confirmDeleteTodos) {
-          await Promise.all(
-            todosToDelete.map(async (todo) => {
-              const todoDeleteResponse = await fetch(
-                `http://localhost:5001/todos/${todo.item_id}`,
-                {
-                  method: "DELETE",
-                }
-              );
-              if (!todoDeleteResponse.ok) {
-                throw new Error(
-                  `Failed to delete todo with ID: ${todo.item_id}`
-                );
-              }
-            })
-          );
-        } else {
-          return;
-        }
+        if (!confirmDeleteTodos) return;
+
+        await Promise.all(
+          todosToDelete.map(async (todo) => {
+            const todoDeleteResponse = await fetch(
+              `http://localhost:5001/todos/${todo.item_id}`,
+              { method: "DELETE" }
+            );
+            if (!todoDeleteResponse.ok) {
+              throw new Error(`Failed to delete todo with ID: ${todo.item_id}`);
+            }
+          })
+        );
       }
 
-      // Confirm deletion of list
       const confirmDeleteList = window.confirm(
         "Are you sure you want to delete this list?"
       );
-      if (!confirmDeleteList) {
-        return;
-      }
+      if (!confirmDeleteList) return;
 
-      // Delete list from the database
       const listDeleteResponse = await fetch(
         `http://localhost:5001/lists/${list_id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
 
       if (!listDeleteResponse.ok) {
@@ -285,7 +215,7 @@ const handleUsernameSubmit = async (e) => {
         return;
       }
 
-      fetchLists(); // Refresh list
+      fetchLists();
     } catch (err) {
       console.error("Error during deletion:", err.message);
       alert("Something went wrong while deleting the list and todos.");
@@ -462,18 +392,21 @@ const handleUsernameSubmit = async (e) => {
           className="nav flex-column"
           style={{ display: isSidebarOpen ? "block" : "none" }}
         >
-          {lists.map((item) => {
-            return (
-              <ListItem
-                key={item.list_id}
-                name={item.name}
-                list_id={item.list_id}
-                goToList={goToList}
-                listDelete={listDelete}
-                isLightMode={isLightMode}
-              />
-            );
-          })}
+          {currentUser && (
+            <div className="list-container">
+              {lists.map((list) => (
+                <ListItem
+                  key={list.list_id}
+                  list={list}
+                  list_id={list.list_id}  // Make sure this value is defined
+                  name={list.name}        // Make sure this value is defined
+                  goToList={goToList}
+                  listDelete={listDelete}
+                  isLightMode={isLightMode}
+                />
+              ))}
+            </div>
+          )}
           <li>
             <button
               className={`navbtn btn ${

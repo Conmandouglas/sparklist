@@ -1,7 +1,7 @@
 import React from "react";
 import EditTodo from "./EditTodo.js";
 
-const TodoList = ({ todos, fetchTodos, lists, colorMap, isLightMode }) => {
+const TodoList = ({ todos, fetchTodos, lists, colorMap, isLightMode, currentUser }) => {
   // Delete todo function
   const deleteTodo = async (id) => {
     try {
@@ -61,54 +61,68 @@ const TodoList = ({ todos, fetchTodos, lists, colorMap, isLightMode }) => {
   };
 
   return (
-    <ul className="container-xl">
-      {todos.map((todo) => (
-        <li
-          className="todo-item my-3"
-          style={{
-            backgroundColor: getHexColor(todo),
-            color: getTextColor(todo),
-          }}
-          key={todo.item_id}
-        >
-          <div>
-            <p>
-              <strong>{todo.title}</strong>
-              <p>{todo.importance}</p>
-            </p>
-          </div>
-          <div>{todo.content}</div>
-          <div className="mt-2">
-            <button
-              className="btn btn-success delete-button me- p-1 px-2"
-              onClick={() => deleteTodo(todo.item_id)}
+    <>
+      {!currentUser ? (
+        <div className="login-prompt">
+          <h2>Please log in to continue</h2>
+        </div>
+      ) : (
+        <ul className="container-xl">
+          {todos.map((todo) => (
+            <li
+              className="todo-item my-3"
+              style={{
+                backgroundColor: getHexColor(todo),
+                color: getTextColor(todo),
+              }}
+              key={todo.item_id}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-check-circle-fill"
-                viewBox="0 0 16 16"
-              >
-                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-              </svg>
-            </button>
-            <EditTodo todo={todo} fetchTodos={fetchTodos} lists={lists} color={todo.color} />
-            <button
-              className={`btn ${todo.pinned ? "btn-warning" : "btn-outline-secondary"} me-2 p-1 px-2`}
-              onClick={() => togglePin(todo.item_id)}
-            >
-              📌
-            </button>
-            {todo.remind_at && (
-              <p className="m-0">{getReadableTime(todo.remind_at)}</p>
-            )}
-          </div>
-        </li>
-      ))}
-    </ul>
+              <div>
+                <p>
+                  <strong>{todo.title}</strong>
+                  <p>{todo.importance}</p>
+                </p>
+              </div>
+              <div>{todo.content}</div>
+              <div className="mt-2">
+                <button
+                  className="btn btn-success delete-button me- p-1 px-2"
+                  onClick={() => deleteTodo(todo.item_id)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="bi bi-check-circle-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                  </svg>
+                </button>
+                <EditTodo
+                  todo={todo}
+                  fetchTodos={fetchTodos}
+                  lists={lists}
+                  color={todo.color}
+                />
+                <button
+                  className={`btn ${todo.pinned ? "btn-warning" : "btn-outline-secondary"} me-2 p-1 px-2`}
+                  onClick={() => togglePin(todo.item_id)}
+                >
+                  📌
+                </button>
+                {todo.remind_at && (
+                  <p className="m-0">{getReadableTime(todo.remind_at)}</p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
+  
 };
 
 export default TodoList;

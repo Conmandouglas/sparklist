@@ -39,17 +39,17 @@ https://www.youtube.com/watch?v=0-bSQ14H_PY
   [4/26/2025 9:59pm] If there is still todos at 5:00 each day (their local time), say the day is wrapping up, be sure to check your todos
   [4/26/2025 9:59pm] On note creation screen, add abilility to add a time to remind
   [4/27/2025 3:53pm] Add ability to edit remind at time
-[] Add multi-user support (review some authentication) https://www.youtube.com/watch?v=vxu1RrR0vbw
+[5/10/2025 10:17pm] Add multi-user support (review some authentication) https://www.youtube.com/watch?v=vxu1RrR0vbw
   [CANCELED] Have a basic auto generated profile pic (different for each user) at the top of hamburger menu and then a sign in/out
     - maybe in top right corner of screen?
   [5/9/2025 3:37pm] Add login and signup functionality
-  [] Add user support to notes & lists, only able to view notes and lists from user thats logged in
-[] Long stretch features (not guarunteed to make it)
+  [5/10/2025 10:17pm] Add user support to notes & lists, only able to view notes and lists from user thats logged in
+[CANCELED] Long stretch features (not guarunteed to make it)
   [CANCELED] Add ability to drag and drop notes
   *drag and drop canceled due to the "importance" feature being more user friendly*
-  [] Add Material UI
+  [CANCELED] Add Material UI
   [CANCELED] Add the ability to import todos from Google Keep using API
   [CANCELED] Add the unique "do" and "don't" style, make the "Add your 'do'" screen and the "Add your 'don't" screen, with seperate tabs, each tab will have lists
-[] Give myself a huge pat on the back for taking on this project in a organized manner :)
+[5/10/2025 10:17pm] Give myself a huge pat on the back for taking on this project in a organized manner :)
 
 learn how to make a simplistic but modern website that is looking good, and make website look professional but modern and simplistic, make it a bit more have character :)

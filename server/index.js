@@ -51,21 +51,32 @@ app.use(flash());
 ///T0DOS/
 //get all todos
 app.get('/todos', async (req, res) => {
+  const { user_id, list_id } = req.query;
+
+  // Check if user_id and list_id are provided
+  if (!user_id || !list_id) {
+    return res.status(400).json({ error: "Missing user_id or list_id" });
+  }
+
   try {
+    // Query todos for a specific user and list
     const items = await pool.query(
-      "SELECT * FROM items ORDER BY pinned DESC, importance DESC, item_id DESC"
+      "SELECT * FROM items WHERE user_id = $1 AND list_id = $2 ORDER BY pinned DESC, importance DESC, item_id DESC",
+      [user_id, list_id]
     );
-    res.json(items.rows); // Send as JSON array
+    
+    res.json(items.rows); // Send the todos as a JSON array
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Server error" });
   }
 });
 
+
 //create a todo
 app.post('/todos', async (req, res) => {
   try {
-    const { title, content, color, importance, list_id, remind_at } = req.body;
+    const { title, content, color, importance, list_id, remind_at, user_id } = req.body;
     console.log("Received remind_at:", remind_at);
 
     // Validate input data
@@ -78,8 +89,8 @@ app.post('/todos', async (req, res) => {
 
     // Insert into the database, setting remind_at to null if not provided
     const newItem = await pool.query(
-      "INSERT INTO items (title, content, color, importance, list_id, remind_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [title, content, color, importanceValue, list_id, remind_at || null]
+      "INSERT INTO items (title, content, color, importance, list_id, remind_at, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [title, content, color, importanceValue, list_id, remind_at, user_id || null]
     );
 
     // Ensure list_id exists and is valid
@@ -184,9 +195,16 @@ app.put("/todos/:id/pin", async (req, res) => {
 
 //get lists
 app.get('/lists', async (req, res) => {
+  const { user_id } = req.query;
+
+  if (!user_id) {
+    return res.status(400).json({ error: "Missing user_id" });
+  }
+  
   try {
     const lists = await pool.query(
-      "SELECT * FROM lists"
+      "SELECT * FROM lists WHERE user_id = $1",
+      [user_id]
     );
 
     res.json(lists.rows);
@@ -212,18 +230,18 @@ app.get('/lists/:id', async (req, res) => {
   }
 });
 
-//create a list
+// Create a list (now supports user_id)
 app.post('/lists', async (req, res) => {
   try {
-    const { listName } = req.body;
+    const { listName, user_id } = req.body;
 
-    if (!listName) {
-      return res.status(400).json({ error: "List name is required" });
+    if (!listName || !user_id) {
+      return res.status(400).json({ error: "List name and user_id are required" });
     }
 
     const newList = await pool.query(
-      "INSERT INTO lists (name) VALUES ($1) RETURNING *",
-      [listName]
+      "INSERT INTO lists (name, user_id) VALUES ($1, $2) RETURNING *",
+      [listName, user_id]
     );
 
     res.json(newList.rows[0]);
@@ -232,6 +250,7 @@ app.post('/lists', async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 //update a list name
 app.put('/lists/:id', async (req, res) => {
@@ -272,16 +291,6 @@ app.delete('/lists/:id', async (req, res) => {
 
 //USER LOGIN & AUTH//
 
-//get all users
-app.get('/users', (req, res) => {
-  //get a list of all users
-});
-
-//get info for a specific user
-app.get('/users/:id', (req, res) => {
-  //get a list of all users
-});
-
 app.post('/users/register', async (req, res) => {
   const { name, email, password, password2 } = req.body;
   let errors = [];
@@ -318,14 +327,25 @@ app.post('/users/register', async (req, res) => {
       [name, email, hashedPassword]
     );
 
-    // Send back success response with user data
+    // Create a default list for the new user
+    const defaultListName = "Default List"; // Default list name
+    const userId = newUser.rows[0].user_id;
+
+    // Insert the default list into the database
+    const newList = await pool.query(
+      "INSERT INTO lists (name, user_id) VALUES ($1, $2) RETURNING list_id, name",
+      [defaultListName, userId]
+    );
+
+    // Send back success response with user data and the default list
     return res.status(201).json({
       message: "User registered successfully",
       user: {
         user_id: newUser.rows[0].user_id,
         name: newUser.rows[0].name,
-        email: newUser.rows[0].email
-      }
+        email: newUser.rows[0].email,
+      },
+      defaultList: newList.rows[0]  // Include the default list
     });
 
   } catch (err) {
@@ -389,14 +409,6 @@ app.put('/users/editname', async (req, res) => {
     console.error(err.message);
     res.status(500).json({ error: "Server error" });
   }
-});
-
-
-
-
-//delete a user
-app.delete('/users', (req, res) => {
-
 });
 
 //SERVER SETUP//

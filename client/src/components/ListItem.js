@@ -1,6 +1,7 @@
 import React from 'react';
 
 function ListItem({ list_id, name, goToList, listDelete, isLightMode }) {
+  console.log('ListItem props:', { list_id, name, goToList, listDelete, isLightMode });
   return (
     <li
       className="nav-item d-flex justify-content-between align-items-center list-item"
